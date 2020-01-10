@@ -13,6 +13,7 @@
 #define SORT_CMP(x, y) ((x) - (y))
 #define SORT_CSWAP(x, y) {SORT_TYPE _sort_swap_temp = MAX((x), (y)); (x) = MIN((x),(y)); (y) = _sort_swap_temp;}
 #include "sort.h"
+#include "extra.h"
 
 /* Used to control the stress test */
 #define SEED 123
@@ -128,13 +129,37 @@ void platform_name(char *output) {
   } \
 } while (0)
 
+#define TEST_EXTRA_H(name) do { \
+  capitalize(#name, capital_word); \
+  for (test = 0; test < SIZES; test++) { \
+    int64_t size = sizes[test]; \
+    int64_t *dst = (int64_t *) malloc(sizeof(int64_t) * size); \
+    diff = 0; \
+    iter = 0; \
+    while (1) { \
+      fill_random(dst, size); \
+      usec1 = utime(); \
+      name (dst, size); \
+      usec2 = utime(); \
+      diff += usec2 - usec1; \
+      iter++; \
+      if (diff >= 1000000.0) { \
+        break; \
+      } \
+    } \
+    free(dst); \
+    sprintf(name_buf, "%s %lld %s", capital_word, size, platform); \
+    printf("%-40s %4d %16.1f ns/op\n", name_buf, iter, diff * 1000.0 / (double) iter); \
+  } \
+} while (0)
+
 
 int main(void) {
   int test, iter;
   double usec1, usec2, diff;
   char capital_word[128];
   char platform[128];
-  char name_buf[128]; \
+  char name_buf[128];
   platform_name(platform);
   TEST_STDLIB(qsort);
 #if !defined(__linux__) && !defined(__CYGWIN__)
@@ -153,5 +178,7 @@ int main(void) {
   TEST_SORT_H(sqrt_sort);
   TEST_SORT_H(rec_stable_sort);
   TEST_SORT_H(grail_sort_dyn_buffer);
+  TEST_EXTRA_H(std_sort_int64);
+  TEST_EXTRA_H(std_stable_int64);
   return 0;
 }

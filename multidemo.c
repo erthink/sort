@@ -15,6 +15,7 @@
 */
 #define SORT_CMP(x, y) (x - y)
 #include "sort.h"
+#include "extra.h"
 
 /*
    We now have the following functions defined
@@ -288,6 +289,34 @@ void run_tests(void) {
   }
 
   printf("tim sort time:              %10.2f us per iteration\n", total_time / RUNS);
+  srand48(SEED);
+  total_time = 0.0;
+
+  for (i = 0; i < RUNS; i++) {
+    fill(arr, SIZE);
+    memcpy(dst, arr, sizeof(int64_t) * SIZE);
+    start_time = utime();
+    std_sort_int64(dst, SIZE);
+    end_time = utime();
+    total_time += end_time - start_time;
+    verify(dst, SIZE);
+  }
+
+  printf("std::sort time:             %10.2f us per iteration\n", total_time / RUNS);
+  srand48(SEED);
+  total_time = 0.0;
+
+  for (i = 0; i < RUNS; i++) {
+    fill(arr, SIZE);
+    memcpy(dst, arr, sizeof(int64_t) * SIZE);
+    start_time = utime();
+    std_stable_int64(dst, SIZE);
+    end_time = utime();
+    total_time += end_time - start_time;
+    verify(dst, SIZE);
+  }
+
+  printf("std::stable_sort time:      %10.2f us per iteration\n", total_time / RUNS);
 }
 
 void run_tests2(void) {
@@ -454,7 +483,36 @@ void run_tests2(void) {
   }
 
   printf("tim sort time:              %10.2f us per iteration\n", total_time / RUNS);
+  srand48(SEED);
+  total_time = 0.0;
+
+  for (i = 0; i < RUNS; i++) {
+    fill(arr, SIZE);
+    memcpy(dst, arr, sizeof(int64_t) * SIZE);
+    start_time = utime();
+    std_sort_int64_gt(dst, SIZE);
+    end_time = utime();
+    total_time += end_time - start_time;
+    verify2(dst, SIZE);
+  }
+
+  printf("std::sort time:             %10.2f us per iteration\n", total_time / RUNS);
+  srand48(SEED);
+  total_time = 0.0;
+
+  for (i = 0; i < RUNS; i++) {
+    fill(arr, SIZE);
+    memcpy(dst, arr, sizeof(int64_t) * SIZE);
+    start_time = utime();
+    std_stable_int64_gt(dst, SIZE);
+    end_time = utime();
+    total_time += end_time - start_time;
+    verify2(dst, SIZE);
+  }
+
+  printf("std::stable_sort time:      %10.2f us per iteration\n", total_time / RUNS);
 }
+
 int main(void) {
   run_tests();
   run_tests2();

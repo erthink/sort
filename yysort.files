@@ -5,6 +5,8 @@ Makefile
 benchmark.c
 demo.c
 doc/timsort.txt
+extra.h
 multidemo.c
 sort.h
+std_sort.cxx
 stresstest.c

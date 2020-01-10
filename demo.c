@@ -16,6 +16,7 @@
 #define MIN(x,y) (((x) < (y) ? (x) : (y)))
 #define SORT_CSWAP(x, y) {SORT_TYPE _sort_swap_temp = MAX((x), (y)); (x) = MIN((x),(y)); (y) = _sort_swap_temp;}
 #include "sort.h"
+#include "extra.h"
 
 /*
    We now have the following functions defined
@@ -324,6 +325,34 @@ void run_tests(void) {
   }
 
   printf("grail sort dyn buffer sort time: %10.2f us per iteration\n", total_time / RUNS);
+  srand48(SEED);
+  total_time = 0.0;
+
+  for (i = 0; i < RUNS; i++) {
+    fill(arr, SIZE);
+    memcpy(dst, arr, sizeof(int64_t) * SIZE);
+    start_time = utime();
+    std_sort_int64(dst, SIZE);
+    end_time = utime();
+    total_time += end_time - start_time;
+    verify(dst, SIZE);
+  }
+
+  printf("std::sort time:                  %10.2f us per iteration\n", total_time / RUNS);
+  srand48(SEED);
+  total_time = 0.0;
+
+  for (i = 0; i < RUNS; i++) {
+    fill(arr, SIZE);
+    memcpy(dst, arr, sizeof(int64_t) * SIZE);
+    start_time = utime();
+    std_stable_int64(dst, SIZE);
+    end_time = utime();
+    total_time += end_time - start_time;
+    verify(dst, SIZE);
+  }
+
+  printf("std::stable_sort time:           %10.2f us per iteration\n", total_time / RUNS);
 }
 
 int main(void) {

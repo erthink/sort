@@ -14,6 +14,8 @@
 #define SORT_CMP(x, y) (*(x) - *(y))
 #include "sort.h"
 
+#include "extra.h"
+
 /* Used to control the stress test */
 #define SEED 123
 #define MAXSIZE 45000
@@ -217,6 +219,26 @@ static void fill(int64_t *dst, const int size, int type) {
   if (!res) return 0; \
 } while (0)
 
+#define TEST_EXTRA_H(name) do { \
+  res = 0; \
+  diff = 0; \
+  printf("%-29s", "extra.h " #name); \
+  for (test = 0; test < sizes_cnt; test++) { \
+    int64_t size = sizes[test]; \
+    fill(dst, size, type); \
+    usec1 = utime(); \
+    name (dst, size); \
+    usec2 = utime(); \
+    res = verify(dst, size); \
+    if (!res) { \
+      break; \
+    } \
+    diff += usec2 - usec1; \
+  } \
+  printf(" - %s, %10.1f usec\n", res ? "ok" : "FAILED", diff); \
+  if (!res) return 0; \
+} while (0)
+
 int run_tests(int64_t *sizes, int sizes_cnt, int type) {
   int test, res;
   double usec1, usec2, diff;
@@ -245,6 +267,8 @@ int run_tests(int64_t *sizes, int sizes_cnt, int type) {
   TEST_SORT_H(sqrt_sort);
   TEST_SORT_H(rec_stable_sort);
   TEST_SORT_H(grail_sort_dyn_buffer);
+  TEST_EXTRA_H(std_sort_int64);
+  TEST_EXTRA_H(std_stable_int64);
   free(dst);
   return 0;
 }
@@ -351,6 +375,8 @@ void stable_tests() {
   check_stable("sqrt sort", stable_sqrt_sort, size, num_values);
   check_stable("rec stable sort", stable_rec_stable_sort, size, num_values);
   check_stable("grail sort dyn byffer", stable_grail_sort_dyn_buffer, size, num_values);
+  check_stable("std::sort", std_sort_pint, size, num_values);
+  check_stable("std::stable_sort", std_stable_pint, size, num_values);
 }
 
 int main(void) {

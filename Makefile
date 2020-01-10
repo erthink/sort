@@ -1,8 +1,9 @@
 # Copyright (c) 2010-2014 Christopher Swenson.
 # Copyright (c) 2012 Google Inc. All Rights Reserved.
 
-CC ?= gcc
 CFLAGS ?= -O3 -g -Wall -std=c89 -pedantic -Wno-long-long -Wno-format
+
+EXTRA_OBJ := std_sort.o
 
 default: demo stresstest multidemo test
 
@@ -13,19 +14,22 @@ test: stresstest benchmark
 	./stresstest
 
 clean:
-	rm -f demo multidemo stresstest benchmark
+	rm -f demo multidemo stresstest benchmark $(EXTRA_OBJ)
 
-demo: demo.c sort.h
-	$(CC) $(CFLAGS) demo.c -o demo
+demo: demo.c sort.h extra.h $(EXTRA_OBJ)
+	$(CC) $(CFLAGS) demo.c $(EXTRA_OBJ) -o demo -lstdc++
 
-multidemo: multidemo.c sort.h
-	$(CC) $(CFLAGS) multidemo.c -o multidemo
+multidemo: multidemo.c sort.h extra.h $(EXTRA_OBJ)
+	$(CC) $(CFLAGS) multidemo.c $(EXTRA_OBJ) -o multidemo -lstdc++
 
-stresstest: stresstest.c sort.h
-	$(CC) $(CFLAGS) stresstest.c -o stresstest
+stresstest: stresstest.c sort.h extra.h $(EXTRA_OBJ)
+	$(CC) $(CFLAGS) stresstest.c $(EXTRA_OBJ) -o stresstest -lstdc++
 
-benchmark: benchmark.c sort.h
-	$(CC) $(CFLAGS) benchmark.c -o benchmark
+benchmark: benchmark.c sort.h extra.h $(EXTRA_OBJ)
+	$(CC) $(CFLAGS) benchmark.c $(EXTRA_OBJ) -o benchmark -lstdc++
 
 format:
-	astyle --options=astyle.options sort.h demo.c multidemo.c stresstest.c benchmark.c
+	astyle --options=astyle.options sort.h demo.c multidemo.c stresstest.c benchmark.c extra.h std_sort.cxx
+
+std_sort.o: std_sort.cxx extra.h
+	$(CXX) $(CFLAGS) -c $< -o $@
