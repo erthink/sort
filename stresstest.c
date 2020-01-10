@@ -269,6 +269,8 @@ int run_tests(int64_t *sizes, int sizes_cnt, int type) {
   TEST_SORT_H(grail_sort_dyn_buffer);
   TEST_EXTRA_H(std_sort_int64);
   TEST_EXTRA_H(std_stable_int64);
+  TEST_EXTRA_H(yysort1_int64);
+  TEST_EXTRA_H(yysort2_int64);
   free(dst);
   return 0;
 }

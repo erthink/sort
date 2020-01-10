@@ -3,7 +3,7 @@
 
 CFLAGS ?= -O3 -g -Wall -std=c89 -pedantic -Wno-long-long -Wno-format
 
-EXTRA_OBJ := std_sort.o
+EXTRA_OBJ := std_sort.o yysort.o
 
 default: demo stresstest multidemo test
 
@@ -29,7 +29,10 @@ benchmark: benchmark.c sort.h extra.h $(EXTRA_OBJ)
 	$(CC) $(CFLAGS) benchmark.c $(EXTRA_OBJ) -o benchmark -lstdc++
 
 format:
-	astyle --options=astyle.options sort.h demo.c multidemo.c stresstest.c benchmark.c extra.h std_sort.cxx
+	astyle --options=astyle.options sort.h demo.c multidemo.c stresstest.c benchmark.c extra.h std_sort.cxx yysort.c
 
 std_sort.o: std_sort.cxx extra.h
 	$(CXX) $(CFLAGS) -c $< -o $@
+
+yysort.o: yysort.c extra.h
+	$(CC) $(CFLAGS) -std=c99 -c $< -o $@
