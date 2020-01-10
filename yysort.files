@@ -1,0 +1,10 @@
+CONTRIBUTING.md
+CONTRIBUTORS.md
+LICENSE.md
+Makefile
+benchmark.c
+demo.c
+doc/timsort.txt
+multidemo.c
+sort.h
+stresstest.c
