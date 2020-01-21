@@ -4,7 +4,7 @@
 CFLAGS ?= -Ofast -g -Wall -pedantic -Wno-format -Wno-unused-function -ffunction-sections
 # -save-temps
 
-EXTRA_OBJ := std_sort.o yysort.o
+EXTRA_OBJ := std_sort.o yysort.o sort_rela589n.o
 
 default: demo stresstest multidemo test
 
@@ -36,6 +36,9 @@ format:
 	astyle --options=astyle.options sort.h demo.c multidemo.c stresstest.c benchmark.c extra.h std_sort.cxx yysort.c
 
 std_sort.o: std_sort.cxx extra.h Makefile
+	$(CXX) $(CFLAGS) -c $< -o $@
+
+sort_rela589n.o: sort_rela589n.cxx extra.h Makefile
 	$(CXX) $(CFLAGS) -c $< -o $@
 
 yysort.o: yysort.c extra.h Makefile

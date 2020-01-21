@@ -363,8 +363,9 @@ int run_tests(int64_t *sizes, int sizes_cnt, int type) {
   printf("-------\nRunning tests with %s:\n", test_names[type]);
   TEST_EXTRA_H(yysort1_int64);
   TEST_EXTRA_H(yysort2_int64);
-  TEST_EXTRA_H(yysort1_int64_sb);
-  TEST_EXTRA_H(yysort2_int64_sb);
+  //TEST_EXTRA_H(yysort1_int64_sb);
+  //TEST_EXTRA_H(yysort2_int64_sb);
+  TEST_EXTRA_H(sort_rela589n_int64);
 
   TEST_SORT_H(tim_sort);
   TEST_SORT_H(quick_sort);
@@ -376,8 +377,8 @@ int run_tests(int64_t *sizes, int sizes_cnt, int type) {
   TEST_SORT_H(merge_sort_in_place);
   TEST_SORT_H(grail_sort);
   TEST_SORT_H(sqrt_sort);
-  TEST_SORT_H(rec_stable_sort);
-  TEST_SORT_H(grail_sort_dyn_buffer);
+  //TEST_SORT_H(rec_stable_sort);
+  //TEST_SORT_H(grail_sort_dyn_buffer);
 
   TEST_STDLIB(qsort);
 #if !defined(__linux__) && !defined(__CYGWIN__)

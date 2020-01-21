@@ -8,6 +8,7 @@ doc/timsort.txt
 extra.h
 multidemo.c
 sort.h
+sort_rela589n.cxx
 std_sort.cxx
 stresstest.c
 yysort.c
