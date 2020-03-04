@@ -9,6 +9,10 @@
 #define SORT_CMP(x, y) ((x) - (y))
 #include "sort.h"
 
+#undef SORT_TYPE
+#undef SORT_CMP
+#undef SORT_SWAP
+
 #define SORT_NAME stable
 #define SORT_TYPE int*
 #define SORT_CMP(x, y) (*(x) - *(y))
@@ -17,8 +21,8 @@
 #include "extra.h"
 
 /* Used to control the stress test */
-#define SEED 123
-#define MAXSIZE 45000
+#define SEED 42
+#define MAXSIZE 42000
 #define TESTS 1000
 
 #define RAND_RANGE(__n, __min, __max) \
@@ -26,27 +30,51 @@
 
 enum {
   FILL_RANDOM,
-  FILL_SAME,
+  FILL_RNDDUP50,
+  FILL_RANDOM2,
+  FILL_RANDOM10,
+  FILL_MIXED,
+  FILL_MIXDUP50,
+  FILL_MIXED2,
+  FILL_MIXED10,
   FILL_SORTED,
+  FILL_SORTED94,
+  FILL_REVERSE,
+  FILL_REVERSE2,
+  FILL_REVERSE10,
+  FILL_ALLSAME,
   FILL_SORTED_10,
   FILL_SORTED_100,
   FILL_SORTED_10000,
   FILL_SWAPPED_N2,
   FILL_SWAPPED_N8,
-  FILL_EVIL,
+  FILL_EVIL1,
+  FILL_EVIL2,
   FILL_LAST_ELEMENT
 };
 
 char *test_names[FILL_LAST_ELEMENT] = {
-  "random numbers",
-  "same number",
-  "sorted numbers",
+  "random",
+  "random 50% duplicates",
+  "random two values",
+  "random of 0..9",
+  "mixed-pattern (1/2 sorted, 1/6 reverse, 1/3 random)",
+  "mixed-pattern 50% duplicates",
+  "mixed-pattern two values",
+  "mixed-pattern of 0..9",
+  "sorted",
+  "sorted 93.75%",
+  "reverse",
+  "111......000",
+  "999..., 888..., ..., ...000",
+  "all same",
   "sorted blocks of length 10",
   "sorted blocks of length 100",
   "sorted blocks of length 10000",
   "swapped size/2 pairs",
   "swapped size/8 pairs",
-  "known evil data"
+  "known evil data (odd/even swap)",
+  "known evil data (odd/even hi/low swap)"
 };
 
 /* used for stdlib */
@@ -56,6 +84,10 @@ static __inline int simple_cmp(const void *a, const void *b) {
   return (da < db) ? -1 : (da == db) ? 0 : 1;
 }
 
+static __inline int simple_cmp_reverse(const void *a, const void *b) {
+  return simple_cmp(b, a);
+}
+
 static __inline double utime() {
   struct timeval t;
   gettimeofday(&t, NULL);
@@ -63,41 +95,76 @@ static __inline double utime() {
 }
 
 /* helper functions */
-int verify(int64_t *dst, const int size) {
-  int i;
-
-  for (i = 1; i < size; i++) {
+int verify(int64_t *dst, const unsigned size) {
+  for (unsigned i = 1; i < size; i++) {
     if (dst[i - 1] > dst[i]) {
       printf("Verify failed! at %d", i);
       return 0;
     }
   }
-
   return 1;
 }
 
-static void fill_random(int64_t *dst, const int size) {
-  int i;
-
-  for (i = 0; i < size; i++) {
+static void fill_random(int64_t *dst, const unsigned size) {
+  for (unsigned i = 0; i < size; i++)
     dst[i] = lrand48();
+}
+
+static void fill_random2(int64_t *dst, const unsigned size) {
+  for (unsigned i = 0; i < size; i++)
+    dst[i] = lrand48() & 1;
+}
+
+static void fill_random10(int64_t *dst, const unsigned size) {
+  for (unsigned i = 0; i < size; i++)
+    dst[i] = lrand48() % 10;
+}
+
+static void make_mixed(int64_t *dst, const unsigned size) {
+  const unsigned sorted = size / 2;
+  const unsigned reverse = size / 2 / 3;
+  qsort(dst, sorted, sizeof(int64_t), simple_cmp);
+  qsort(dst + sorted, reverse, sizeof(int64_t), simple_cmp_reverse);
+}
+
+static void make_disord6(int64_t *dst, const unsigned size) {
+  uint64_t r = dst[0];
+  for (int i = size / 16; i >= 0; --i) {
+    r = r * UINT64_C(6364136223846793005) + 1;
+    const unsigned x = (r >> 29) % size;
+    r = r * UINT64_C(6364136223846793005) + 1;
+    const unsigned y = (r >> 29) % size;
+    int64_t t = dst[x];
+    dst[x] = dst[y];
+    dst[y] = t;
   }
 }
 
-static void fill_same(int64_t *dst, const int size) {
-  int i;
-
-  for (i = 0; i < size; i++) {
+static void fill_same(int64_t *dst, const unsigned size) {
+  for (unsigned i = 0; i < size; i++)
     dst[i] = 0;
+}
+
+static void fill_dup50(int64_t *dst, const unsigned size) {
+  fill_random(dst, size);
+  uint64_t r = dst[0];
+  for (unsigned i = 0; i < size; i++) {
+    r = r * UINT64_C(6364136223846793005) + 1;
+    const unsigned x = (r >> 29) % size;
+    r = r * UINT64_C(6364136223846793005) + 1;
+    const unsigned y = (r >> 29) % size;
+    dst[x] = dst[y];
   }
 }
 
-static void fill_sorted(int64_t *dst, const int size) {
-  int i;
-
-  for (i = 0; i < size; i++) {
+static void fill_sorted(int64_t *dst, const unsigned size) {
+  for (unsigned i = 0; i < size; i++)
     dst[i] = i;
-  }
+}
+
+static void fill_reverse(int64_t *dst, const unsigned size) {
+  for (unsigned i = 0; i < size; i++)
+    dst[size - i] = i;
 }
 
 static void fill_sorted_blocks(int64_t *dst, const int size, const int block_size) {
@@ -113,34 +180,81 @@ static void fill_sorted_blocks(int64_t *dst, const int size, const int block_siz
 }
 
 static void fill_swapped(int64_t *dst, const int size, const int swapped_cnt) {
-  int i, tmp;
-  size_t ind1 = 0;
-  size_t ind2 = 0;
   fill_sorted(dst, size);
-
-  for (i = 0; i < swapped_cnt; i++) {
-    ind1 = lrand48();
+  for (unsigned i = 0; i < swapped_cnt; i++) {
+    size_t ind1 = lrand48();
     RAND_RANGE(ind1, 0, size);
-    ind2 = lrand48();
+    size_t ind2 = lrand48();
     RAND_RANGE(ind2, 0, size);
-    tmp = dst[ind1];
+    int64_t tmp = dst[ind1];
     dst[ind1] = dst[ind2];
     dst[ind2] = tmp;
   }
 }
 
-static void fill_evil(int64_t *dst, const int size) {
-  int i;
-
-  for (i = 0; i < size; i++) {
-    dst[i] = i ^ 1;
-  }
-}
-
 static void fill(int64_t *dst, const int size, int type) {
   switch (type) {
+  case FILL_RANDOM:
+    fill_random(dst, size);
+    break;
+
+  case FILL_RNDDUP50:
+    fill_dup50(dst, size);
+    break;
+
+  case FILL_RANDOM2:
+    fill_random2(dst, size);
+    break;
+
+  case FILL_RANDOM10:
+    fill_random10(dst, size);
+    break;
+
+  case FILL_MIXED:
+    fill_random(dst, size);
+    make_mixed(dst, size);
+    break;
+
+  case FILL_MIXDUP50:
+    fill_dup50(dst, size);
+    make_mixed(dst, size);
+    break;
+
+  case FILL_MIXED2:
+    fill_random2(dst, size);
+    make_mixed(dst, size);
+    break;
+
+  case FILL_MIXED10:
+    fill_random10(dst, size);
+    make_mixed(dst, size);
+    break;
+
   case FILL_SORTED:
     fill_sorted(dst, size);
+    break;
+
+  case FILL_SORTED94:
+    fill_sorted(dst, size);
+    make_disord6(dst, size);
+    break;
+
+  case FILL_REVERSE:
+    fill_reverse(dst, size);
+    break;
+
+  case FILL_REVERSE2:
+    fill_random2(dst, size);
+    qsort(dst, size, sizeof(int64_t), simple_cmp_reverse);
+    break;
+
+  case FILL_REVERSE10:
+    fill_random10(dst, size);
+    qsort(dst, size, sizeof(int64_t), simple_cmp_reverse);
+    break;
+
+  case FILL_ALLSAME:
+    fill_same(dst, size);
     break;
 
   case FILL_SORTED_10:
@@ -163,18 +277,18 @@ static void fill(int64_t *dst, const int size, int type) {
     fill_swapped(dst, size, size / 8);
     break;
 
-  case FILL_SAME:
-    fill_same(dst, size);
+  case FILL_EVIL1:
+    for (unsigned i = 0; i < size; i++)
+      dst[i] = i ^ 1;
     break;
 
-  case FILL_EVIL:
-    fill_evil(dst, size);
+  case FILL_EVIL2:
+    for (unsigned i = 0; i < size; i++)
+      dst[i] = (i & 1) ? i : size - i;
     break;
 
-  case FILL_RANDOM:
   default:
-    fill_random(dst, size);
-    break;
+    abort();
   }
 }
 
@@ -195,6 +309,7 @@ static void fill(int64_t *dst, const int size, int type) {
     diff += usec2 - usec1; \
   } \
   printf(" - %s, %10.1f usec\n", res ? "ok" : "FAILED", diff); \
+  fflush(NULL); \
   if (!res) return 0; \
 } while (0)
 
@@ -216,6 +331,7 @@ static void fill(int64_t *dst, const int size, int type) {
     diff += usec2 - usec1; \
   } \
   printf(" - %s, %10.1f usec\n", res ? "ok" : "FAILED", diff); \
+  fflush(NULL); \
   if (!res) return 0; \
 } while (0)
 
@@ -236,6 +352,7 @@ static void fill(int64_t *dst, const int size, int type) {
     diff += usec2 - usec1; \
   } \
   printf(" - %s, %10.1f usec\n", res ? "ok" : "FAILED", diff); \
+  fflush(NULL); \
   if (!res) return 0; \
 } while (0)
 
@@ -243,7 +360,25 @@ int run_tests(int64_t *sizes, int sizes_cnt, int type) {
   int test, res;
   double usec1, usec2, diff;
   int64_t * dst = (int64_t *)malloc(MAXSIZE * sizeof(int64_t));
-  printf("-------\nRunning tests with %s:\n-------\n", test_names[type]);
+  printf("-------\nRunning tests with %s:\n", test_names[type]);
+  TEST_EXTRA_H(yysort1_int64);
+  TEST_EXTRA_H(yysort2_int64);
+  TEST_EXTRA_H(yysort1_int64_sb);
+  TEST_EXTRA_H(yysort2_int64_sb);
+
+  TEST_SORT_H(tim_sort);
+  TEST_SORT_H(quick_sort);
+  TEST_EXTRA_H(std_sort_int64);
+  TEST_EXTRA_H(std_stable_int64);
+  TEST_SORT_H(heap_sort);
+  TEST_SORT_H(merge_sort);
+  TEST_SORT_H(shell_sort);
+  TEST_SORT_H(merge_sort_in_place);
+  TEST_SORT_H(grail_sort);
+  TEST_SORT_H(sqrt_sort);
+  TEST_SORT_H(rec_stable_sort);
+  TEST_SORT_H(grail_sort_dyn_buffer);
+
   TEST_STDLIB(qsort);
 #if !defined(__linux__) && !defined(__CYGWIN__)
   TEST_STDLIB(heapsort);
@@ -256,21 +391,6 @@ int run_tests(int64_t *sizes, int sizes_cnt, int type) {
     TEST_SORT_H(binary_insertion_sort);
     TEST_SORT_H(bitonic_sort);
   }
-
-  TEST_SORT_H(quick_sort);
-  TEST_SORT_H(merge_sort);
-  TEST_SORT_H(heap_sort);
-  TEST_SORT_H(shell_sort);
-  TEST_SORT_H(tim_sort);
-  TEST_SORT_H(merge_sort_in_place);
-  TEST_SORT_H(grail_sort);
-  TEST_SORT_H(sqrt_sort);
-  TEST_SORT_H(rec_stable_sort);
-  TEST_SORT_H(grail_sort_dyn_buffer);
-  TEST_EXTRA_H(std_sort_int64);
-  TEST_EXTRA_H(std_stable_int64);
-  TEST_EXTRA_H(yysort1_int64);
-  TEST_EXTRA_H(yysort2_int64);
   free(dst);
   return 0;
 }
