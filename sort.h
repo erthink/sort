@@ -2,10 +2,10 @@
 /* Copyright (c) 2012 Vojtech Fried. */
 /* Copyright (c) 2012 Google Inc. All Rights Reserved. */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #ifndef SORT_NAME
 #error "Must declare SORT_NAME"
@@ -16,7 +16,7 @@
 #endif
 
 #ifndef SORT_CMP
-#define SORT_CMP(x, y)  ((x) < (y) ? -1 : ((y) < (x) ? 1 : 0))
+#define SORT_CMP(x, y) ((x) < (y) ? -1 : ((y) < (x) ? 1 : 0))
 #endif
 
 #ifdef __cplusplus
@@ -37,32 +37,87 @@
 #endif
 
 #ifndef SORT_SWAP
-#define SORT_SWAP(x,y) {SORT_TYPE _sort_swap_temp = (x); (x) = (y); (y) = _sort_swap_temp;}
+#define SORT_SWAP(x, y)                                                        \
+  {                                                                            \
+    SORT_TYPE _sort_swap_temp = (x);                                           \
+    (x) = (y);                                                                 \
+    (y) = _sort_swap_temp;                                                     \
+  }
 #endif
 
-/* Common, type-agnostic functions and constants that we don't want to declare twice. */
+/* Common, type-agnostic functions and constants that we don't want to declare
+ * twice. */
 #ifndef SORT_COMMON_H
 #define SORT_COMMON_H
 
 #ifndef MAX
-#define MAX(x,y) (((x) > (y) ? (x) : (y)))
+#define MAX(x, y) (((x) > (y) ? (x) : (y)))
 #endif
 
 #ifndef MIN
-#define MIN(x,y) (((x) < (y) ? (x) : (y)))
+#define MIN(x, y) (((x) < (y) ? (x) : (y)))
 #endif
 
 static int compute_minrun(const uint64_t);
 
 /* From http://oeis.org/classic/A102549 */
-static const uint64_t shell_gaps[48] = {1, 4, 10, 23, 57, 132, 301, 701, 1750, 4376, 10941, 27353, 68383, 170958, 427396, 1068491, 2671228, 6678071, 16695178, 41737946, 104344866, 260862166, 652155416, 1630388541, 4075971353LL, 10189928383LL, 25474820958LL, 63687052396LL, 159217630991LL, 398044077478LL, 995110193696LL, 2487775484241LL, 6219438710603LL, 15548596776508LL, 38871491941271LL, 97178729853178LL, 242946824632946LL, 607367061582366LL, 1518417653955916LL, 3796044134889791LL, 9490110337224478LL, 23725275843061196LL, 59313189607652991LL, 148282974019132478LL, 370707435047831196LL, 926768587619577991LL, 2316921469048944978LL, 5792303672622362446LL};
+static const uint64_t shell_gaps[48] = {1,
+                                        4,
+                                        10,
+                                        23,
+                                        57,
+                                        132,
+                                        301,
+                                        701,
+                                        1750,
+                                        4376,
+                                        10941,
+                                        27353,
+                                        68383,
+                                        170958,
+                                        427396,
+                                        1068491,
+                                        2671228,
+                                        6678071,
+                                        16695178,
+                                        41737946,
+                                        104344866,
+                                        260862166,
+                                        652155416,
+                                        1630388541,
+                                        4075971353LL,
+                                        10189928383LL,
+                                        25474820958LL,
+                                        63687052396LL,
+                                        159217630991LL,
+                                        398044077478LL,
+                                        995110193696LL,
+                                        2487775484241LL,
+                                        6219438710603LL,
+                                        15548596776508LL,
+                                        38871491941271LL,
+                                        97178729853178LL,
+                                        242946824632946LL,
+                                        607367061582366LL,
+                                        1518417653955916LL,
+                                        3796044134889791LL,
+                                        9490110337224478LL,
+                                        23725275843061196LL,
+                                        59313189607652991LL,
+                                        148282974019132478LL,
+                                        370707435047831196LL,
+                                        926768587619577991LL,
+                                        2316921469048944978LL,
+                                        5792303672622362446LL};
 
 #ifndef CLZ
 /* clang-only */
 #ifndef __has_builtin
 #define __has_builtin(x) 0
 #endif
-#if __has_builtin(__builtin_clzll) || (defined(__GNUC__) && ((__GNUC__ == 3 && __GNUC_MINOR__ >= 4) || (__GNUC__ > 3)))
+#if __has_builtin(__builtin_clzll) ||                                          \
+    (defined(__GNUC__) &&                                                      \
+     ((__GNUC__ == 3 && __GNUC_MINOR__ >= 4) || (__GNUC__ > 3)))
 #define CLZ __builtin_clzll
 #else
 
@@ -140,9 +195,9 @@ static __inline size_t rbnd(size_t len) {
 
 #endif /* SORT_COMMON_H */
 
-#define SORT_CONCAT(x, y) x ## _ ## y
-#define SORT_MAKE_STR1(x, y) SORT_CONCAT(x,y)
-#define SORT_MAKE_STR(x) SORT_MAKE_STR1(SORT_NAME,x)
+#define SORT_CONCAT(x, y) x##_##y
+#define SORT_MAKE_STR1(x, y) SORT_CONCAT(x, y)
+#define SORT_MAKE_STR(x) SORT_MAKE_STR1(SORT_NAME, x)
 
 #ifndef SMALL_SORT_BND
 #define SMALL_SORT_BND 16
@@ -152,96 +207,108 @@ static __inline size_t rbnd(size_t len) {
 /*#define SMALL_SORT BINARY_INSERTION_SORT*/
 #endif
 
-#define SORT_TYPE_CPY                  SORT_MAKE_STR(sort_type_cpy)
-#define SORT_TYPE_MOVE                 SORT_MAKE_STR(sort_type_move)
-#define SORT_NEW_BUFFER                SORT_MAKE_STR(sort_new_buffer)
-#define SORT_DELETE_BUFFER             SORT_MAKE_STR(sort_delete_buffer)
-#define BITONIC_SORT                   SORT_MAKE_STR(bitonic_sort)
-#define BINARY_INSERTION_FIND          SORT_MAKE_STR(binary_insertion_find)
-#define BINARY_INSERTION_SORT_START    SORT_MAKE_STR(binary_insertion_sort_start)
-#define BINARY_INSERTION_SORT          SORT_MAKE_STR(binary_insertion_sort)
-#define REVERSE_ELEMENTS               SORT_MAKE_STR(reverse_elements)
-#define COUNT_RUN                      SORT_MAKE_STR(count_run)
-#define CHECK_INVARIANT                SORT_MAKE_STR(check_invariant)
-#define TIM_SORT                       SORT_MAKE_STR(tim_sort)
-#define TIM_SORT_GALLOP                SORT_MAKE_STR(tim_sort_gallop)
-#define TIM_SORT_RESIZE                SORT_MAKE_STR(tim_sort_resize)
-#define TIM_SORT_MERGE                 SORT_MAKE_STR(tim_sort_merge)
-#define TIM_SORT_MERGE_LEFT            SORT_MAKE_STR(tim_sort_merge_left)
-#define TIM_SORT_MERGE_RIGHT           SORT_MAKE_STR(tim_sort_merge_right)
-#define TIM_SORT_COLLAPSE              SORT_MAKE_STR(tim_sort_collapse)
-#define HEAP_SORT                      SORT_MAKE_STR(heap_sort)
-#define MEDIAN                         SORT_MAKE_STR(median)
-#define QUICK_SORT                     SORT_MAKE_STR(quick_sort)
-#define MERGE_SORT                     SORT_MAKE_STR(merge_sort)
-#define MERGE_SORT_RECURSIVE           SORT_MAKE_STR(merge_sort_recursive)
-#define MERGE_SORT_IN_PLACE            SORT_MAKE_STR(merge_sort_in_place)
-#define MERGE_SORT_IN_PLACE_RMERGE     SORT_MAKE_STR(merge_sort_in_place_rmerge)
-#define MERGE_SORT_IN_PLACE_BACKMERGE  SORT_MAKE_STR(merge_sort_in_place_backmerge)
-#define MERGE_SORT_IN_PLACE_FRONTMERGE SORT_MAKE_STR(merge_sort_in_place_frontmerge)
-#define MERGE_SORT_IN_PLACE_ASWAP      SORT_MAKE_STR(merge_sort_in_place_aswap)
-#define SELECTION_SORT                 SORT_MAKE_STR(selection_sort)
-#define SHELL_SORT                     SORT_MAKE_STR(shell_sort)
-#define QUICK_SORT_PARTITION           SORT_MAKE_STR(quick_sort_partition)
-#define QUICK_SORT_RECURSIVE           SORT_MAKE_STR(quick_sort_recursive)
-#define HEAP_SIFT_DOWN                 SORT_MAKE_STR(heap_sift_down)
-#define HEAPIFY                        SORT_MAKE_STR(heapify)
-#define TIM_SORT_RUN_T                 SORT_MAKE_STR(tim_sort_run_t)
-#define TEMP_STORAGE_T                 SORT_MAKE_STR(temp_storage_t)
-#define PUSH_NEXT                      SORT_MAKE_STR(push_next)
-#define GRAIL_SWAP1                    SORT_MAKE_STR(grail_swap1)
-#define REC_STABLE_SORT                SORT_MAKE_STR(rec_stable_sort)
-#define GRAIL_REC_MERGE                SORT_MAKE_STR(grail_rec_merge)
-#define GRAIL_SORT_DYN_BUFFER          SORT_MAKE_STR(grail_sort_dyn_buffer)
-#define GRAIL_SORT_FIXED_BUFFER        SORT_MAKE_STR(grail_sort_fixed_buffer)
-#define GRAIL_COMMON_SORT              SORT_MAKE_STR(grail_common_sort)
-#define GRAIL_SORT                     SORT_MAKE_STR(grail_sort)
-#define GRAIL_COMBINE_BLOCKS           SORT_MAKE_STR(grail_combine_blocks)
-#define GRAIL_LAZY_STABLE_SORT         SORT_MAKE_STR(grail_lazy_stable_sort)
-#define GRAIL_MERGE_WITHOUT_BUFFER     SORT_MAKE_STR(grail_merge_without_buffer)
-#define GRAIL_ROTATE                   SORT_MAKE_STR(grail_rotate)
-#define GRAIL_BIN_SEARCH_LEFT          SORT_MAKE_STR(grail_bin_search_left)
-#define GRAIL_BUILD_BLOCKS             SORT_MAKE_STR(grail_build_blocks)
-#define GRAIL_FIND_KEYS                SORT_MAKE_STR(grail_find_keys)
-#define GRAIL_MERGE_BUFFERS_LEFT_WITH_X_BUF SORT_MAKE_STR(grail_merge_buffers_left_with_x_buf)
-#define GRAIL_BIN_SEARCH_RIGHT         SORT_MAKE_STR(grail_bin_search_right)
-#define GRAIL_MERGE_BUFFERS_LEFT       SORT_MAKE_STR(grail_merge_buffers_left)
-#define GRAIL_SMART_MERGE_WITH_X_BUF   SORT_MAKE_STR(grail_smart_merge_with_x_buf)
-#define GRAIL_MERGE_LEFT_WITH_X_BUF    SORT_MAKE_STR(grail_merge_left_with_x_buf)
-#define GRAIL_SMART_MERGE_WITHOUT_BUFFER SORT_MAKE_STR(grail_smart_merge_without_buffer)
-#define GRAIL_SMART_MERGE_WITH_BUFFER  SORT_MAKE_STR(grail_smart_merge_with_buffer)
-#define GRAIL_MERGE_RIGHT              SORT_MAKE_STR(grail_merge_right)
-#define GRAIL_MERGE_LEFT               SORT_MAKE_STR(grail_merge_left)
-#define GRAIL_SWAP_N                   SORT_MAKE_STR(grail_swap_n)
-#define SQRT_SORT                      SORT_MAKE_STR(sqrt_sort)
-#define SQRT_SORT_BUILD_BLOCKS         SORT_MAKE_STR(sqrt_sort_build_blocks)
-#define SQRT_SORT_MERGE_BUFFERS_LEFT_WITH_X_BUF SORT_MAKE_STR(sqrt_sort_merge_buffers_left_with_x_buf)
-#define SQRT_SORT_MERGE_DOWN           SORT_MAKE_STR(sqrt_sort_merge_down)
-#define SQRT_SORT_MERGE_LEFT_WITH_X_BUF SORT_MAKE_STR(sqrt_sort_merge_left_with_x_buf)
-#define SQRT_SORT_MERGE_RIGHT          SORT_MAKE_STR(sqrt_sort_merge_right)
-#define SQRT_SORT_SWAP_N               SORT_MAKE_STR(sqrt_sort_swap_n)
-#define SQRT_SORT_SWAP_1               SORT_MAKE_STR(sqrt_sort_swap_1)
-#define SQRT_SORT_SMART_MERGE_WITH_X_BUF SORT_MAKE_STR(sqrt_sort_smart_merge_with_x_buf)
-#define SQRT_SORT_SORT_INS             SORT_MAKE_STR(sqrt_sort_sort_ins)
-#define SQRT_SORT_COMBINE_BLOCKS       SORT_MAKE_STR(sqrt_sort_combine_blocks)
-#define SQRT_SORT_COMMON_SORT          SORT_MAKE_STR(sqrt_sort_common_sort)
-#define BUBBLE_SORT                    SORT_MAKE_STR(bubble_sort)
+#define SORT_TYPE_CPY SORT_MAKE_STR(sort_type_cpy)
+#define SORT_TYPE_MOVE SORT_MAKE_STR(sort_type_move)
+#define SORT_NEW_BUFFER SORT_MAKE_STR(sort_new_buffer)
+#define SORT_DELETE_BUFFER SORT_MAKE_STR(sort_delete_buffer)
+#define BITONIC_SORT SORT_MAKE_STR(bitonic_sort)
+#define BINARY_INSERTION_FIND SORT_MAKE_STR(binary_insertion_find)
+#define BINARY_INSERTION_SORT_START SORT_MAKE_STR(binary_insertion_sort_start)
+#define BINARY_INSERTION_SORT SORT_MAKE_STR(binary_insertion_sort)
+#define REVERSE_ELEMENTS SORT_MAKE_STR(reverse_elements)
+#define COUNT_RUN SORT_MAKE_STR(count_run)
+#define CHECK_INVARIANT SORT_MAKE_STR(check_invariant)
+#define TIM_SORT SORT_MAKE_STR(tim_sort)
+#define TIM_SORT_GALLOP SORT_MAKE_STR(tim_sort_gallop)
+#define TIM_SORT_RESIZE SORT_MAKE_STR(tim_sort_resize)
+#define TIM_SORT_MERGE SORT_MAKE_STR(tim_sort_merge)
+#define TIM_SORT_MERGE_LEFT SORT_MAKE_STR(tim_sort_merge_left)
+#define TIM_SORT_MERGE_RIGHT SORT_MAKE_STR(tim_sort_merge_right)
+#define TIM_SORT_COLLAPSE SORT_MAKE_STR(tim_sort_collapse)
+#define HEAP_SORT SORT_MAKE_STR(heap_sort)
+#define MEDIAN SORT_MAKE_STR(median)
+#define QUICK_SORT SORT_MAKE_STR(quick_sort)
+#define MERGE_SORT SORT_MAKE_STR(merge_sort)
+#define MERGE_SORT_RECURSIVE SORT_MAKE_STR(merge_sort_recursive)
+#define MERGE_SORT_IN_PLACE SORT_MAKE_STR(merge_sort_in_place)
+#define MERGE_SORT_IN_PLACE_RMERGE SORT_MAKE_STR(merge_sort_in_place_rmerge)
+#define MERGE_SORT_IN_PLACE_BACKMERGE                                          \
+  SORT_MAKE_STR(merge_sort_in_place_backmerge)
+#define MERGE_SORT_IN_PLACE_FRONTMERGE                                         \
+  SORT_MAKE_STR(merge_sort_in_place_frontmerge)
+#define MERGE_SORT_IN_PLACE_ASWAP SORT_MAKE_STR(merge_sort_in_place_aswap)
+#define SELECTION_SORT SORT_MAKE_STR(selection_sort)
+#define SHELL_SORT SORT_MAKE_STR(shell_sort)
+#define QUICK_SORT_PARTITION SORT_MAKE_STR(quick_sort_partition)
+#define QUICK_SORT_RECURSIVE SORT_MAKE_STR(quick_sort_recursive)
+#define HEAP_SIFT_DOWN SORT_MAKE_STR(heap_sift_down)
+#define HEAPIFY SORT_MAKE_STR(heapify)
+#define TIM_SORT_RUN_T SORT_MAKE_STR(tim_sort_run_t)
+#define TEMP_STORAGE_T SORT_MAKE_STR(temp_storage_t)
+#define PUSH_NEXT SORT_MAKE_STR(push_next)
+#define GRAIL_SWAP1 SORT_MAKE_STR(grail_swap1)
+#define REC_STABLE_SORT SORT_MAKE_STR(rec_stable_sort)
+#define GRAIL_REC_MERGE SORT_MAKE_STR(grail_rec_merge)
+#define GRAIL_SORT_DYN_BUFFER SORT_MAKE_STR(grail_sort_dyn_buffer)
+#define GRAIL_SORT_FIXED_BUFFER SORT_MAKE_STR(grail_sort_fixed_buffer)
+#define GRAIL_COMMON_SORT SORT_MAKE_STR(grail_common_sort)
+#define GRAIL_SORT SORT_MAKE_STR(grail_sort)
+#define GRAIL_COMBINE_BLOCKS SORT_MAKE_STR(grail_combine_blocks)
+#define GRAIL_LAZY_STABLE_SORT SORT_MAKE_STR(grail_lazy_stable_sort)
+#define GRAIL_MERGE_WITHOUT_BUFFER SORT_MAKE_STR(grail_merge_without_buffer)
+#define GRAIL_ROTATE SORT_MAKE_STR(grail_rotate)
+#define GRAIL_BIN_SEARCH_LEFT SORT_MAKE_STR(grail_bin_search_left)
+#define GRAIL_BUILD_BLOCKS SORT_MAKE_STR(grail_build_blocks)
+#define GRAIL_FIND_KEYS SORT_MAKE_STR(grail_find_keys)
+#define GRAIL_MERGE_BUFFERS_LEFT_WITH_X_BUF                                    \
+  SORT_MAKE_STR(grail_merge_buffers_left_with_x_buf)
+#define GRAIL_BIN_SEARCH_RIGHT SORT_MAKE_STR(grail_bin_search_right)
+#define GRAIL_MERGE_BUFFERS_LEFT SORT_MAKE_STR(grail_merge_buffers_left)
+#define GRAIL_SMART_MERGE_WITH_X_BUF SORT_MAKE_STR(grail_smart_merge_with_x_buf)
+#define GRAIL_MERGE_LEFT_WITH_X_BUF SORT_MAKE_STR(grail_merge_left_with_x_buf)
+#define GRAIL_SMART_MERGE_WITHOUT_BUFFER                                       \
+  SORT_MAKE_STR(grail_smart_merge_without_buffer)
+#define GRAIL_SMART_MERGE_WITH_BUFFER                                          \
+  SORT_MAKE_STR(grail_smart_merge_with_buffer)
+#define GRAIL_MERGE_RIGHT SORT_MAKE_STR(grail_merge_right)
+#define GRAIL_MERGE_LEFT SORT_MAKE_STR(grail_merge_left)
+#define GRAIL_SWAP_N SORT_MAKE_STR(grail_swap_n)
+#define SQRT_SORT SORT_MAKE_STR(sqrt_sort)
+#define SQRT_SORT_BUILD_BLOCKS SORT_MAKE_STR(sqrt_sort_build_blocks)
+#define SQRT_SORT_MERGE_BUFFERS_LEFT_WITH_X_BUF                                \
+  SORT_MAKE_STR(sqrt_sort_merge_buffers_left_with_x_buf)
+#define SQRT_SORT_MERGE_DOWN SORT_MAKE_STR(sqrt_sort_merge_down)
+#define SQRT_SORT_MERGE_LEFT_WITH_X_BUF                                        \
+  SORT_MAKE_STR(sqrt_sort_merge_left_with_x_buf)
+#define SQRT_SORT_MERGE_RIGHT SORT_MAKE_STR(sqrt_sort_merge_right)
+#define SQRT_SORT_SWAP_N SORT_MAKE_STR(sqrt_sort_swap_n)
+#define SQRT_SORT_SWAP_1 SORT_MAKE_STR(sqrt_sort_swap_1)
+#define SQRT_SORT_SMART_MERGE_WITH_X_BUF                                       \
+  SORT_MAKE_STR(sqrt_sort_smart_merge_with_x_buf)
+#define SQRT_SORT_SORT_INS SORT_MAKE_STR(sqrt_sort_sort_ins)
+#define SQRT_SORT_COMBINE_BLOCKS SORT_MAKE_STR(sqrt_sort_combine_blocks)
+#define SQRT_SORT_COMMON_SORT SORT_MAKE_STR(sqrt_sort_common_sort)
+#define BUBBLE_SORT SORT_MAKE_STR(bubble_sort)
 
 #ifndef MAX
-#define MAX(x,y) (((x) > (y) ? (x) : (y)))
+#define MAX(x, y) (((x) > (y) ? (x) : (y)))
 #endif
 #ifndef MIN
-#define MIN(x,y) (((x) < (y) ? (x) : (y)))
+#define MIN(x, y) (((x) < (y) ? (x) : (y)))
 #endif
 #ifndef SORT_CSWAP
-#define SORT_CSWAP(x, y) { if(SORT_CMP((x),(y)) > 0) {SORT_SWAP((x),(y));}}
+#define SORT_CSWAP(x, y)                                                       \
+  {                                                                            \
+    if (SORT_CMP((x), (y)) > 0) {                                              \
+      SORT_SWAP((x), (y));                                                     \
+    }                                                                          \
+  }
 #endif
 
 typedef struct {
   size_t start;
   size_t length;
 } TIM_SORT_RUN_T;
-
 
 void SHELL_SORT(SORT_TYPE *dst, const size_t size);
 void BINARY_INSERTION_SORT(SORT_TYPE *dst, const size_t size);
@@ -259,27 +326,24 @@ void GRAIL_SORT_FIXED_BUFFER(SORT_TYPE *dst, const size_t size);
 void GRAIL_SORT(SORT_TYPE *dst, const size_t size);
 void SQRT_SORT(SORT_TYPE *dst, const size_t size);
 
-/* The full implementation of a bitonic sort is not here. Since we only want to use
-   sorting networks for small length lists we create optimal sorting networks for
-   lists of length <= 16 and call out to BINARY_INSERTION_SORT for anything larger
-   than 16.
-   Optimal sorting networks for small length lists.
+/* The full implementation of a bitonic sort is not here. Since we only want to
+   use sorting networks for small length lists we create optimal sorting
+   networks for lists of length <= 16 and call out to BINARY_INSERTION_SORT for
+   anything larger than 16. Optimal sorting networks for small length lists.
    Taken from https://pages.ripco.net/~jgamble/nw.html */
-#define BITONIC_SORT_2          SORT_MAKE_STR(bitonic_sort_2)
+#define BITONIC_SORT_2 SORT_MAKE_STR(bitonic_sort_2)
 static __inline void BITONIC_SORT_2(SORT_TYPE *dst) {
   SORT_CSWAP(dst[0], dst[1]);
 }
 
-
-#define BITONIC_SORT_3          SORT_MAKE_STR(bitonic_sort_3)
+#define BITONIC_SORT_3 SORT_MAKE_STR(bitonic_sort_3)
 static __inline void BITONIC_SORT_3(SORT_TYPE *dst) {
   SORT_CSWAP(dst[1], dst[2]);
   SORT_CSWAP(dst[0], dst[2]);
   SORT_CSWAP(dst[0], dst[1]);
 }
 
-
-#define BITONIC_SORT_4          SORT_MAKE_STR(bitonic_sort_4)
+#define BITONIC_SORT_4 SORT_MAKE_STR(bitonic_sort_4)
 static __inline void BITONIC_SORT_4(SORT_TYPE *dst) {
   SORT_CSWAP(dst[0], dst[1]);
   SORT_CSWAP(dst[2], dst[3]);
@@ -288,8 +352,7 @@ static __inline void BITONIC_SORT_4(SORT_TYPE *dst) {
   SORT_CSWAP(dst[1], dst[2]);
 }
 
-
-#define BITONIC_SORT_5          SORT_MAKE_STR(bitonic_sort_5)
+#define BITONIC_SORT_5 SORT_MAKE_STR(bitonic_sort_5)
 static __inline void BITONIC_SORT_5(SORT_TYPE *dst) {
   SORT_CSWAP(dst[0], dst[1]);
   SORT_CSWAP(dst[3], dst[4]);
@@ -302,8 +365,7 @@ static __inline void BITONIC_SORT_5(SORT_TYPE *dst) {
   SORT_CSWAP(dst[1], dst[2]);
 }
 
-
-#define BITONIC_SORT_6          SORT_MAKE_STR(bitonic_sort_6)
+#define BITONIC_SORT_6 SORT_MAKE_STR(bitonic_sort_6)
 static __inline void BITONIC_SORT_6(SORT_TYPE *dst) {
   SORT_CSWAP(dst[1], dst[2]);
   SORT_CSWAP(dst[4], dst[5]);
@@ -319,8 +381,7 @@ static __inline void BITONIC_SORT_6(SORT_TYPE *dst) {
   SORT_CSWAP(dst[2], dst[3]);
 }
 
-
-#define BITONIC_SORT_7          SORT_MAKE_STR(bitonic_sort_7)
+#define BITONIC_SORT_7 SORT_MAKE_STR(bitonic_sort_7)
 static __inline void BITONIC_SORT_7(SORT_TYPE *dst) {
   SORT_CSWAP(dst[1], dst[2]);
   SORT_CSWAP(dst[3], dst[4]);
@@ -340,8 +401,7 @@ static __inline void BITONIC_SORT_7(SORT_TYPE *dst) {
   SORT_CSWAP(dst[2], dst[3]);
 }
 
-
-#define BITONIC_SORT_8          SORT_MAKE_STR(bitonic_sort_8)
+#define BITONIC_SORT_8 SORT_MAKE_STR(bitonic_sort_8)
 static __inline void BITONIC_SORT_8(SORT_TYPE *dst) {
   SORT_CSWAP(dst[0], dst[1]);
   SORT_CSWAP(dst[2], dst[3]);
@@ -364,8 +424,7 @@ static __inline void BITONIC_SORT_8(SORT_TYPE *dst) {
   SORT_CSWAP(dst[3], dst[4]);
 }
 
-
-#define BITONIC_SORT_9          SORT_MAKE_STR(bitonic_sort_9)
+#define BITONIC_SORT_9 SORT_MAKE_STR(bitonic_sort_9)
 static __inline void BITONIC_SORT_9(SORT_TYPE *dst) {
   SORT_CSWAP(dst[0], dst[1]);
   SORT_CSWAP(dst[3], dst[4]);
@@ -394,8 +453,7 @@ static __inline void BITONIC_SORT_9(SORT_TYPE *dst) {
   SORT_CSWAP(dst[2], dst[3]);
 }
 
-
-#define BITONIC_SORT_10          SORT_MAKE_STR(bitonic_sort_10)
+#define BITONIC_SORT_10 SORT_MAKE_STR(bitonic_sort_10)
 static __inline void BITONIC_SORT_10(SORT_TYPE *dst) {
   SORT_CSWAP(dst[4], dst[9]);
   SORT_CSWAP(dst[3], dst[8]);
@@ -428,8 +486,7 @@ static __inline void BITONIC_SORT_10(SORT_TYPE *dst) {
   SORT_CSWAP(dst[4], dst[5]);
 }
 
-
-#define BITONIC_SORT_11          SORT_MAKE_STR(bitonic_sort_11)
+#define BITONIC_SORT_11 SORT_MAKE_STR(bitonic_sort_11)
 static __inline void BITONIC_SORT_11(SORT_TYPE *dst) {
   SORT_CSWAP(dst[0], dst[1]);
   SORT_CSWAP(dst[2], dst[3]);
@@ -468,8 +525,7 @@ static __inline void BITONIC_SORT_11(SORT_TYPE *dst) {
   SORT_CSWAP(dst[7], dst[8]);
 }
 
-
-#define BITONIC_SORT_12          SORT_MAKE_STR(bitonic_sort_12)
+#define BITONIC_SORT_12 SORT_MAKE_STR(bitonic_sort_12)
 static __inline void BITONIC_SORT_12(SORT_TYPE *dst) {
   SORT_CSWAP(dst[0], dst[1]);
   SORT_CSWAP(dst[2], dst[3]);
@@ -512,8 +568,7 @@ static __inline void BITONIC_SORT_12(SORT_TYPE *dst) {
   SORT_CSWAP(dst[7], dst[8]);
 }
 
-
-#define BITONIC_SORT_13          SORT_MAKE_STR(bitonic_sort_13)
+#define BITONIC_SORT_13 SORT_MAKE_STR(bitonic_sort_13)
 static __inline void BITONIC_SORT_13(SORT_TYPE *dst) {
   SORT_CSWAP(dst[1], dst[7]);
   SORT_CSWAP(dst[9], dst[11]);
@@ -562,8 +617,7 @@ static __inline void BITONIC_SORT_13(SORT_TYPE *dst) {
   SORT_CSWAP(dst[5], dst[6]);
 }
 
-
-#define BITONIC_SORT_14          SORT_MAKE_STR(bitonic_sort_14)
+#define BITONIC_SORT_14 SORT_MAKE_STR(bitonic_sort_14)
 static __inline void BITONIC_SORT_14(SORT_TYPE *dst) {
   SORT_CSWAP(dst[0], dst[1]);
   SORT_CSWAP(dst[2], dst[3]);
@@ -618,8 +672,7 @@ static __inline void BITONIC_SORT_14(SORT_TYPE *dst) {
   SORT_CSWAP(dst[8], dst[9]);
 }
 
-
-#define BITONIC_SORT_15          SORT_MAKE_STR(bitonic_sort_15)
+#define BITONIC_SORT_15 SORT_MAKE_STR(bitonic_sort_15)
 static __inline void BITONIC_SORT_15(SORT_TYPE *dst) {
   SORT_CSWAP(dst[0], dst[1]);
   SORT_CSWAP(dst[2], dst[3]);
@@ -679,8 +732,7 @@ static __inline void BITONIC_SORT_15(SORT_TYPE *dst) {
   SORT_CSWAP(dst[8], dst[9]);
 }
 
-
-#define BITONIC_SORT_16          SORT_MAKE_STR(bitonic_sort_16)
+#define BITONIC_SORT_16 SORT_MAKE_STR(bitonic_sort_16)
 static __inline void BITONIC_SORT_16(SORT_TYPE *dst) {
   SORT_CSWAP(dst[0], dst[1]);
   SORT_CSWAP(dst[2], dst[3]);
@@ -842,28 +894,29 @@ void SORT_TYPE_MOVE(SORT_TYPE *dst, SORT_TYPE *src, const size_t size) {
 #else
 
 #undef SORT_TYPE_CPY
-#define SORT_TYPE_CPY(dst, src, size) memcpy((dst), (src), (size) * sizeof(SORT_TYPE))
+#define SORT_TYPE_CPY(dst, src, size)                                          \
+  memcpy((dst), (src), (size) * sizeof(SORT_TYPE))
 #undef SORT_TYPE_MOVE
-#define SORT_TYPE_MOVE(dst, src, size) memmove((dst), (src), (size) * sizeof(SORT_TYPE))
+#define SORT_TYPE_MOVE(dst, src, size)                                         \
+  memmove((dst), (src), (size) * sizeof(SORT_TYPE))
 
 #endif
 
-SORT_TYPE* SORT_NEW_BUFFER(size_t size) {
+SORT_TYPE *SORT_NEW_BUFFER(size_t size) {
 #if SORT_SAFE_CPY
   return new SORT_TYPE[size];
 #else
-  return (SORT_TYPE*)malloc(size * sizeof(SORT_TYPE));
+  return (SORT_TYPE *)malloc(size * sizeof(SORT_TYPE));
 #endif
 }
 
-void SORT_DELETE_BUFFER(SORT_TYPE* pointer) {
+void SORT_DELETE_BUFFER(SORT_TYPE *pointer) {
 #if SORT_SAFE_CPY
   delete[] pointer;
 #else
   free(pointer);
 #endif
 }
-
 
 /* Shell sort implementation based on Wikipedia article
    http://en.wikipedia.org/wiki/Shell_sort
@@ -906,7 +959,7 @@ void SHELL_SORT(SORT_TYPE *dst, const size_t size) {
 
 /* Function used to do a binary search for binary insertion sort */
 static __inline size_t BINARY_INSERTION_FIND(SORT_TYPE *dst, const SORT_TYPE x,
-    const size_t size) {
+                                             const size_t size) {
   size_t l, c, r;
   SORT_TYPE cx;
   l = 0;
@@ -944,8 +997,10 @@ static __inline size_t BINARY_INSERTION_FIND(SORT_TYPE *dst, const SORT_TYPE x,
   }
 }
 
-/* Binary insertion sort, but knowing that the first "start" entries are sorted.  Used in timsort. */
-static void BINARY_INSERTION_SORT_START(SORT_TYPE *dst, const size_t start, const size_t size) {
+/* Binary insertion sort, but knowing that the first "start" entries are sorted.
+ * Used in timsort. */
+static void BINARY_INSERTION_SORT_START(SORT_TYPE *dst, const size_t start,
+                                        const size_t size) {
   size_t i;
 
   for (i = start; i < size; i++) {
@@ -958,7 +1013,8 @@ static void BINARY_INSERTION_SORT_START(SORT_TYPE *dst, const size_t start, cons
       continue;
     }
 
-    /* Else we need to find the right place, shift everything over, and squeeze in */
+    /* Else we need to find the right place, shift everything over, and squeeze
+     * in */
     x = dst[i];
     location = BINARY_INSERTION_FIND(dst, x, i);
 
@@ -1003,7 +1059,7 @@ void SELECTION_SORT(SORT_TYPE *dst, const size_t size) {
 }
 
 /* In-place mergesort */
-void MERGE_SORT_IN_PLACE_ASWAP(SORT_TYPE * dst1, SORT_TYPE * dst2, size_t len) {
+void MERGE_SORT_IN_PLACE_ASWAP(SORT_TYPE *dst1, SORT_TYPE *dst2, size_t len) {
   do {
     SORT_SWAP(*dst1, *dst2);
     dst1++;
@@ -1011,7 +1067,8 @@ void MERGE_SORT_IN_PLACE_ASWAP(SORT_TYPE * dst1, SORT_TYPE * dst2, size_t len) {
   } while (--len);
 }
 
-void MERGE_SORT_IN_PLACE_FRONTMERGE(SORT_TYPE *dst1, size_t l1, SORT_TYPE *dst2, size_t l2) {
+void MERGE_SORT_IN_PLACE_FRONTMERGE(SORT_TYPE *dst1, size_t l1, SORT_TYPE *dst2,
+                                    size_t l2) {
   SORT_TYPE *dst0 = dst2 - l1;
 
   if (SORT_CMP(dst1[l1 - 1], dst2[0]) <= 0) {
@@ -1042,7 +1099,8 @@ void MERGE_SORT_IN_PLACE_FRONTMERGE(SORT_TYPE *dst1, size_t l1, SORT_TYPE *dst2,
   } while (--l1);
 }
 
-size_t MERGE_SORT_IN_PLACE_BACKMERGE(SORT_TYPE * dst1, size_t l1, SORT_TYPE * dst2, size_t l2) {
+size_t MERGE_SORT_IN_PLACE_BACKMERGE(SORT_TYPE *dst1, size_t l1,
+                                     SORT_TYPE *dst2, size_t l2) {
   size_t res;
   SORT_TYPE *dst0 = dst2 + l1;
 
@@ -1079,7 +1137,8 @@ size_t MERGE_SORT_IN_PLACE_BACKMERGE(SORT_TYPE * dst1, size_t l1, SORT_TYPE * ds
 }
 
 /* merge dst[p0..p1) by buffer dst[p1..p1+r) */
-void MERGE_SORT_IN_PLACE_RMERGE(SORT_TYPE *dst, size_t len, size_t lp, size_t r) {
+void MERGE_SORT_IN_PLACE_RMERGE(SORT_TYPE *dst, size_t len, size_t lp,
+                                size_t r) {
   size_t i, lq;
   int cv;
 
@@ -1106,7 +1165,8 @@ void MERGE_SORT_IN_PLACE_RMERGE(SORT_TYPE *dst, size_t len, size_t lp, size_t r)
     }
 
     if (q != i) {
-      MERGE_SORT_IN_PLACE_ASWAP(dst + i, dst + q, r); /* swap it with current position */
+      MERGE_SORT_IN_PLACE_ASWAP(dst + i, dst + q,
+                                r); /* swap it with current position */
 
       if (q == lq && q < (len - r)) {
         lq += r;
@@ -1114,9 +1174,11 @@ void MERGE_SORT_IN_PLACE_RMERGE(SORT_TYPE *dst, size_t len, size_t lp, size_t r)
     }
 
     if (i != 0 && SORT_CMP(dst[i], dst[i - 1]) < 0) {
-      MERGE_SORT_IN_PLACE_ASWAP(dst + len, dst + i, r); /* swap current position with buffer */
-      MERGE_SORT_IN_PLACE_BACKMERGE(dst + (len + r - 1), r, dst + (i - 1),
-                                    r);  /* buffer :merge: dst[i-r..i) -> dst[i-r..i+r) */
+      MERGE_SORT_IN_PLACE_ASWAP(dst + len, dst + i,
+                                r); /* swap current position with buffer */
+      MERGE_SORT_IN_PLACE_BACKMERGE(
+          dst + (len + r - 1), r, dst + (i - 1),
+          r); /* buffer :merge: dst[i-r..i) -> dst[i-r..i+r) */
     }
 
     if (lp == i) {
@@ -1125,7 +1187,8 @@ void MERGE_SORT_IN_PLACE_RMERGE(SORT_TYPE *dst, size_t len, size_t lp, size_t r)
   }
 }
 
-/* In-place Merge Sort implementation. (c)2012, Andrey Astrelin, astrelin@tochka.ru */
+/* In-place Merge Sort implementation. (c)2012, Andrey Astrelin,
+ * astrelin@tochka.ru */
 void MERGE_SORT_IN_PLACE(SORT_TYPE *dst, const size_t len) {
   /* don't bother sorting an array of size <= 1 */
   size_t r = rbnd(len);
@@ -1157,7 +1220,7 @@ void MERGE_SORT_IN_PLACE(SORT_TYPE *dst, const size_t len) {
     q = 2;
 
     while ((p & q) == 0) {
-      if (SORT_CMP(dst1[1 - q], dst1[-(int) q]) < 0) {
+      if (SORT_CMP(dst1[1 - q], dst1[-(int)q]) < 0) {
         break;
       }
 
@@ -1220,7 +1283,8 @@ void MERGE_SORT_IN_PLACE(SORT_TYPE *dst, const size_t len) {
 }
 
 /* Standard merge sort */
-void MERGE_SORT_RECURSIVE(SORT_TYPE *newdst, SORT_TYPE *dst, const size_t size) {
+void MERGE_SORT_RECURSIVE(SORT_TYPE *newdst, SORT_TYPE *dst,
+                          const size_t size) {
   const size_t middle = size / 2;
   size_t out = 0;
   size_t i = 0;
@@ -1279,9 +1343,9 @@ void MERGE_SORT(SORT_TYPE *dst, const size_t size) {
   SORT_DELETE_BUFFER(newdst);
 }
 
-
 static __inline size_t QUICK_SORT_PARTITION(SORT_TYPE *dst, const size_t left,
-    const size_t right, const size_t pivot) {
+                                            const size_t right,
+                                            const size_t pivot) {
   SORT_TYPE value = dst[pivot];
   size_t index = left;
   size_t i;
@@ -1311,10 +1375,8 @@ static __inline size_t QUICK_SORT_PARTITION(SORT_TYPE *dst, const size_t left,
 }
 
 /* Based on Knuth vol. 3
-static __inline size_t QUICK_SORT_HOARE_PARTITION(SORT_TYPE *dst, const size_t l,
-    const size_t r, const size_t pivot) {
-  SORT_TYPE value;
-  size_t i = l + 1;
+static __inline size_t QUICK_SORT_HOARE_PARTITION(SORT_TYPE *dst, const size_t
+l, const size_t r, const size_t pivot) { SORT_TYPE value; size_t i = l + 1;
   size_t j = r;
 
   if (pivot != l) {
@@ -1341,10 +1403,9 @@ static __inline size_t QUICK_SORT_HOARE_PARTITION(SORT_TYPE *dst, const size_t l
 }
 */
 
-
 /* Return the median index of the objects at the three indices. */
-static __inline size_t MEDIAN(const SORT_TYPE *dst, const size_t a, const size_t b,
-                              const size_t c) {
+static __inline size_t MEDIAN(const SORT_TYPE *dst, const size_t a,
+                              const size_t b, const size_t c) {
   const int AB = SORT_CMP(dst[a], dst[b]) < 0;
 
   if (AB) {
@@ -1418,8 +1479,8 @@ static void QUICK_SORT_RECURSIVE(SORT_TYPE *dst, const size_t original_left,
 
     /* median of 5 */
     middle = left + ((right - left) >> 1);
-    pivot = MEDIAN((const SORT_TYPE *) dst, left, middle, right);
-    pivot = MEDIAN((const SORT_TYPE *) dst, left + ((middle - left) >> 1), pivot,
+    pivot = MEDIAN((const SORT_TYPE *)dst, left, middle, right);
+    pivot = MEDIAN((const SORT_TYPE *)dst, left + ((middle - left) >> 1), pivot,
                    middle + ((right - middle) >> 1));
     new_pivot = QUICK_SORT_PARTITION(dst, left, right, pivot);
 
@@ -1453,10 +1514,10 @@ void QUICK_SORT(SORT_TYPE *dst, const size_t size) {
   QUICK_SORT_RECURSIVE(dst, 0U, size - 1U);
 }
 
-
 /* timsort implementation, based on timsort.txt */
 
-static __inline void REVERSE_ELEMENTS(SORT_TYPE *dst, size_t start, size_t end) {
+static __inline void REVERSE_ELEMENTS(SORT_TYPE *dst, size_t start,
+                                      size_t end) {
   while (1) {
     if (start >= end) {
       return;
@@ -1556,10 +1617,12 @@ typedef struct {
 
 static void TIM_SORT_RESIZE(TEMP_STORAGE_T *store, const size_t new_size) {
   if ((store->storage == NULL) || (store->alloc < new_size)) {
-    SORT_TYPE *tempstore = (SORT_TYPE *)realloc(store->storage, new_size * sizeof(SORT_TYPE));
+    SORT_TYPE *tempstore =
+        (SORT_TYPE *)realloc(store->storage, new_size * sizeof(SORT_TYPE));
 
     if (tempstore == NULL) {
-      fprintf(stderr, "Error allocating temporary storage for tim sort: need %lu bytes",
+      fprintf(stderr,
+              "Error allocating temporary storage for tim sort: need %lu bytes",
               (unsigned long)(sizeof(SORT_TYPE) * new_size));
       exit(1);
     }
@@ -1569,12 +1632,11 @@ static void TIM_SORT_RESIZE(TEMP_STORAGE_T *store, const size_t new_size) {
   }
 }
 
-
-static size_t TIM_SORT_GALLOP(SORT_TYPE *dst, const size_t size, const SORT_TYPE key, size_t anchor,
-                              int right) {
+static size_t TIM_SORT_GALLOP(SORT_TYPE *dst, const size_t size,
+                              const SORT_TYPE key, size_t anchor, int right) {
   int last_ofs = 0;
   int ofs, max_ofs, ofs_sign, cmp;
-  size_t  l, c, r;
+  size_t l, c, r;
   cmp = SORT_CMP(key, dst[anchor]);
 
   if (cmp < 0 || (!right && cmp == 0)) {
@@ -1662,10 +1724,9 @@ static size_t TIM_SORT_GALLOP(SORT_TYPE *dst, const size_t size, const SORT_TYPE
   return r;
 }
 
-
-
-static void TIM_SORT_MERGE_LEFT(SORT_TYPE *A_src, SORT_TYPE *B_src, const size_t A, const size_t B,
-                                SORT_TYPE* storage, int *min_gallop_p) {
+static void TIM_SORT_MERGE_LEFT(SORT_TYPE *A_src, SORT_TYPE *B_src,
+                                const size_t A, const size_t B,
+                                SORT_TYPE *storage, int *min_gallop_p) {
   size_t pdst, pa, pb, k;
   int a_count, b_count;
   int min_gallop = *min_gallop_p;
@@ -1714,7 +1775,7 @@ static void TIM_SORT_MERGE_LEFT(SORT_TYPE *A_src, SORT_TYPE *B_src, const size_t
 
     for (;;) {
       if (min_gallop != 0) {
-        min_gallop --;
+        min_gallop--;
       }
 
       k = TIM_SORT_GALLOP(&A_src[pa], A - pa, B_src[pb], 0, 1);
@@ -1757,9 +1818,9 @@ copyA:
   return;
 }
 
-
-static void TIM_SORT_MERGE_RIGHT(SORT_TYPE *A_src, SORT_TYPE *B_src, const size_t A, const size_t B,
-                                 SORT_TYPE* storage, int *min_gallop_p) {
+static void TIM_SORT_MERGE_RIGHT(SORT_TYPE *A_src, SORT_TYPE *B_src,
+                                 const size_t A, const size_t B,
+                                 SORT_TYPE *storage, int *min_gallop_p) {
   size_t k;
   int pdst, pa, pb, a_count, b_count;
   int min_gallop = *min_gallop_p;
@@ -1811,7 +1872,7 @@ static void TIM_SORT_MERGE_RIGHT(SORT_TYPE *A_src, SORT_TYPE *B_src, const size_
 
     for (;;) {
       if (min_gallop != 0) {
-        min_gallop --;
+        min_gallop--;
       }
 
       k = TIM_SORT_GALLOP(A_src, pa + 1, B_src[pb], pa, 1);
@@ -1855,9 +1916,9 @@ copyB:
   return;
 }
 
-
-static void TIM_SORT_MERGE(SORT_TYPE *dst, const TIM_SORT_RUN_T *stack, const int stack_curr,
-                           TEMP_STORAGE_T *store, int* min_gallop_p) {
+static void TIM_SORT_MERGE(SORT_TYPE *dst, const TIM_SORT_RUN_T *stack,
+                           const int stack_curr, TEMP_STORAGE_T *store,
+                           int *min_gallop_p) {
   size_t A = stack[stack_curr - 2].length;
   size_t B = stack[stack_curr - 1].length;
   size_t A_start = stack[stack_curr - 2].start;
@@ -1881,14 +1942,17 @@ static void TIM_SORT_MERGE(SORT_TYPE *dst, const TIM_SORT_RUN_T *stack, const in
   storage = store->storage;
 
   if (A < B) {
-    TIM_SORT_MERGE_LEFT(&dst[A_start], &dst[B_start], A, B, storage, min_gallop_p);
+    TIM_SORT_MERGE_LEFT(&dst[A_start], &dst[B_start], A, B, storage,
+                        min_gallop_p);
   } else {
-    TIM_SORT_MERGE_RIGHT(&dst[A_start], &dst[B_start], A, B, storage, min_gallop_p);
+    TIM_SORT_MERGE_RIGHT(&dst[A_start], &dst[B_start], A, B, storage,
+                         min_gallop_p);
   }
 }
 
-static int TIM_SORT_COLLAPSE(SORT_TYPE *dst, TIM_SORT_RUN_T *stack, int stack_curr,
-                             TEMP_STORAGE_T *store, const size_t size, int* min_gallop_p) {
+static int TIM_SORT_COLLAPSE(SORT_TYPE *dst, TIM_SORT_RUN_T *stack,
+                             int stack_curr, TEMP_STORAGE_T *store,
+                             const size_t size, int *min_gallop_p) {
   while (1) {
     size_t A, B, C, D;
     int ABC, BCD, CD;
@@ -1951,14 +2015,10 @@ static int TIM_SORT_COLLAPSE(SORT_TYPE *dst, TIM_SORT_RUN_T *stack, int stack_cu
   return stack_curr;
 }
 
-static __inline int PUSH_NEXT(SORT_TYPE *dst,
-                              const size_t size,
-                              TEMP_STORAGE_T *store,
-                              const size_t minrun,
-                              TIM_SORT_RUN_T *run_stack,
-                              size_t *stack_curr,
-                              size_t *curr,
-                              int *min_gallop_p) {
+static __inline int PUSH_NEXT(SORT_TYPE *dst, const size_t size,
+                              TEMP_STORAGE_T *store, const size_t minrun,
+                              TIM_SORT_RUN_T *run_stack, size_t *stack_curr,
+                              size_t *curr, int *min_gallop_p) {
   size_t len = COUNT_RUN(dst, *curr, size);
   size_t run = minrun;
 
@@ -2020,25 +2080,30 @@ void TIM_SORT(SORT_TYPE *dst, const size_t size) {
   store->alloc = 0;
   store->storage = NULL;
 
-  if (!PUSH_NEXT(dst, size, store, minrun, run_stack, &stack_curr, &curr, &min_gallop)) {
+  if (!PUSH_NEXT(dst, size, store, minrun, run_stack, &stack_curr, &curr,
+                 &min_gallop)) {
     return;
   }
 
-  if (!PUSH_NEXT(dst, size, store, minrun, run_stack, &stack_curr, &curr, &min_gallop)) {
+  if (!PUSH_NEXT(dst, size, store, minrun, run_stack, &stack_curr, &curr,
+                 &min_gallop)) {
     return;
   }
 
-  if (!PUSH_NEXT(dst, size, store, minrun, run_stack, &stack_curr, &curr, &min_gallop)) {
+  if (!PUSH_NEXT(dst, size, store, minrun, run_stack, &stack_curr, &curr,
+                 &min_gallop)) {
     return;
   }
 
   while (1) {
     if (!CHECK_INVARIANT(run_stack, (int)stack_curr)) {
-      stack_curr = TIM_SORT_COLLAPSE(dst, run_stack, (int)stack_curr, store, size, &min_gallop);
+      stack_curr = TIM_SORT_COLLAPSE(dst, run_stack, (int)stack_curr, store,
+                                     size, &min_gallop);
       continue;
     }
 
-    if (!PUSH_NEXT(dst, size, store, minrun, run_stack, &stack_curr, &curr, &min_gallop)) {
+    if (!PUSH_NEXT(dst, size, store, minrun, run_stack, &stack_curr, &curr,
+                   &min_gallop)) {
       return;
     }
   }
@@ -2046,7 +2111,8 @@ void TIM_SORT(SORT_TYPE *dst, const size_t size) {
 
 /* heap sort: based on wikipedia */
 
-static __inline void HEAP_SIFT_DOWN(SORT_TYPE *dst, const size_t start, const size_t end) {
+static __inline void HEAP_SIFT_DOWN(SORT_TYPE *dst, const size_t start,
+                                    const size_t end) {
   size_t root = start;
 
   while ((root << 1) <= end) {
@@ -2109,7 +2175,7 @@ void HEAP_SORT(SORT_TYPE *dst, const size_t size) {
 /*                                                       */
 /*********************************************************/
 
-#define SORT_CMP_A(a,b) SORT_CMP(*(a),*(b))
+#define SORT_CMP_A(a, b) SORT_CMP(*(a), *(b))
 
 static __inline void SQRT_SORT_SWAP_1(SORT_TYPE *a, SORT_TYPE *b) {
   SORT_TYPE c = *a;
@@ -2123,7 +2189,6 @@ static __inline void SQRT_SORT_SWAP_N(SORT_TYPE *a, SORT_TYPE *b, int n) {
   }
 }
 
-
 static void SQRT_SORT_MERGE_RIGHT(SORT_TYPE *arr, int L1, int L2, int M) {
   int p0 = L1 + L2 + M - 1, p2 = L1 + L2 - 1, p1 = L1 - 1;
 
@@ -2135,13 +2200,15 @@ static void SQRT_SORT_MERGE_RIGHT(SORT_TYPE *arr, int L1, int L2, int M) {
     }
   }
 
-  if (p2 != p0) while (p2 >= L1) {
+  if (p2 != p0)
+    while (p2 >= L1) {
       arr[p0--] = arr[p2--];
     }
 }
 
 /* arr[M..-1] - free, arr[0,L1-1]++arr[L1,L1+L2-1] -> arr[M,M+L1+L2-1] */
-static void SQRT_SORT_MERGE_LEFT_WITH_X_BUF(SORT_TYPE *arr, int L1, int L2, int M) {
+static void SQRT_SORT_MERGE_LEFT_WITH_X_BUF(SORT_TYPE *arr, int L1, int L2,
+                                            int M) {
   int p0 = 0, p1 = L1;
   L2 += L1;
 
@@ -2153,13 +2220,15 @@ static void SQRT_SORT_MERGE_LEFT_WITH_X_BUF(SORT_TYPE *arr, int L1, int L2, int 
     }
   }
 
-  if (M != p0) while (p0 < L1) {
+  if (M != p0)
+    while (p0 < L1) {
       arr[M++] = arr[p0++];
     }
 }
 
 /* arr[0,L1-1] ++ arr2[0,L2-1] -> arr[-L1,L2-1],  arr2 is "before" arr1 */
-static void SQRT_SORT_MERGE_DOWN(SORT_TYPE *arr, SORT_TYPE *arr2, int L1, int L2) {
+static void SQRT_SORT_MERGE_DOWN(SORT_TYPE *arr, SORT_TYPE *arr2, int L1,
+                                 int L2) {
   int p0 = 0, p1 = 0, M = -L2;
 
   while (p1 < L2) {
@@ -2170,13 +2239,14 @@ static void SQRT_SORT_MERGE_DOWN(SORT_TYPE *arr, SORT_TYPE *arr2, int L1, int L2
     }
   }
 
-  if (M != p0) while (p0 < L1) {
+  if (M != p0)
+    while (p0 < L1) {
       arr[M++] = arr[p0++];
     }
 }
 
-static void SQRT_SORT_SMART_MERGE_WITH_X_BUF(SORT_TYPE *arr, int *alen1, int *atype, int len2,
-    int lkeys) {
+static void SQRT_SORT_SMART_MERGE_WITH_X_BUF(SORT_TYPE *arr, int *alen1,
+                                             int *atype, int len2, int lkeys) {
   int p0 = -lkeys, p1 = 0, p2 = *alen1, q1 = p2, q2 = p2 + len2;
   int ftype = 1 - *atype; /* 1 if inverted */
 
@@ -2200,16 +2270,19 @@ static void SQRT_SORT_SMART_MERGE_WITH_X_BUF(SORT_TYPE *arr, int *alen1, int *at
   }
 }
 
-
 /*
   arr - starting array. arr[-lblock..-1] - buffer (if havebuf).
-  lblock - length of regular blocks. First nblocks are stable sorted by 1st elements and key-coded
-  keys - arrays of keys, in same order as blocks. key<midkey means stream A
-  nblock2 are regular blocks from stream A. llast is length of last (irregular) block from stream B, that should go before nblock2 blocks.
-  llast=0 requires nblock2=0 (no irregular blocks). llast>0, nblock2=0 is possible.
+  lblock - length of regular blocks. First nblocks are stable sorted by 1st
+  elements and key-coded keys - arrays of keys, in same order as blocks.
+  key<midkey means stream A nblock2 are regular blocks from stream A. llast is
+  length of last (irregular) block from stream B, that should go before nblock2
+  blocks. llast=0 requires nblock2=0 (no irregular blocks). llast>0, nblock2=0
+  is possible.
 */
-static void SQRT_SORT_MERGE_BUFFERS_LEFT_WITH_X_BUF(int *keys, int midkey, SORT_TYPE *arr,
-    int nblock, int lblock, int nblock2, int llast) {
+static void SQRT_SORT_MERGE_BUFFERS_LEFT_WITH_X_BUF(int *keys, int midkey,
+                                                    SORT_TYPE *arr, int nblock,
+                                                    int lblock, int nblock2,
+                                                    int llast) {
   int l, prest, lrest, frest, pidx, cidx, fnext;
 
   if (nblock == 0) {
@@ -2231,7 +2304,8 @@ static void SQRT_SORT_MERGE_BUFFERS_LEFT_WITH_X_BUF(int *keys, int midkey, SORT_
       prest = pidx;
       lrest = lblock;
     } else {
-      SQRT_SORT_SMART_MERGE_WITH_X_BUF(arr + prest, &lrest, &frest, lblock, lblock);
+      SQRT_SORT_SMART_MERGE_WITH_X_BUF(arr + prest, &lrest, &frest, lblock,
+                                       lblock);
     }
   }
 
@@ -2315,7 +2389,6 @@ static void SQRT_SORT_BUILD_BLOCKS(SORT_TYPE *arr, int L, int K) {
   }
 }
 
-
 static void SQRT_SORT_SORT_INS(SORT_TYPE *arr, int len) {
   int i, j;
 
@@ -2327,10 +2400,11 @@ static void SQRT_SORT_SORT_INS(SORT_TYPE *arr, int len) {
 }
 
 /*
-  keys are on the left of arr. Blocks of length LL combined. We'll combine them in pairs
-  LL and nkeys are powers of 2. (2*LL/lblock) keys are guarantied
+  keys are on the left of arr. Blocks of length LL combined. We'll combine them
+  in pairs LL and nkeys are powers of 2. (2*LL/lblock) keys are guarantied
 */
-static void SQRT_SORT_COMBINE_BLOCKS(SORT_TYPE *arr, int len, int LL, int lblock, int *tags) {
+static void SQRT_SORT_COMBINE_BLOCKS(SORT_TYPE *arr, int len, int LL,
+                                     int lblock, int *tags) {
   int M, b, NBlk, midkey, lrest, u, i, p, v, kc, nbl2, llast;
   SORT_TYPE *arr1;
   M = len / (2 * LL);
@@ -2368,7 +2442,7 @@ static void SQRT_SORT_COMBINE_BLOCKS(SORT_TYPE *arr, int len, int LL, int lblock
       }
 
       if (p != u - 1) {
-        SQRT_SORT_SWAP_N(arr1 + (u - 1)*lblock, arr1 + p * lblock, lblock);
+        SQRT_SORT_SWAP_N(arr1 + (u - 1) * lblock, arr1 + p * lblock, lblock);
         i = tags[u - 1];
         tags[u - 1] = tags[p];
         tags[p] = i;
@@ -2382,12 +2456,14 @@ static void SQRT_SORT_COMBINE_BLOCKS(SORT_TYPE *arr, int len, int LL, int lblock
     }
 
     if (llast != 0) {
-      while (nbl2 < NBlk && SORT_CMP_A(arr1 + NBlk * lblock, arr1 + (NBlk - nbl2 - 1)*lblock) < 0) {
+      while (nbl2 < NBlk && SORT_CMP_A(arr1 + NBlk * lblock,
+                                       arr1 + (NBlk - nbl2 - 1) * lblock) < 0) {
         nbl2++;
       }
     }
 
-    SQRT_SORT_MERGE_BUFFERS_LEFT_WITH_X_BUF(tags, midkey, arr1, NBlk - nbl2, lblock, nbl2, llast);
+    SQRT_SORT_MERGE_BUFFERS_LEFT_WITH_X_BUF(tags, midkey, arr1, NBlk - nbl2,
+                                            lblock, nbl2, llast);
   }
 
   for (p = len; --p >= 0;) {
@@ -2395,8 +2471,8 @@ static void SQRT_SORT_COMBINE_BLOCKS(SORT_TYPE *arr, int len, int LL, int lblock
   }
 }
 
-
-static void SQRT_SORT_COMMON_SORT(SORT_TYPE *arr, int Len, SORT_TYPE *extbuf, int *Tags) {
+static void SQRT_SORT_COMMON_SORT(SORT_TYPE *arr, int Len, SORT_TYPE *extbuf,
+                                  int *Tags) {
   int lblock, cbuf;
 
   if (Len < 16) {
@@ -2436,10 +2512,10 @@ void SQRT_SORT(SORT_TYPE *arr, size_t Len) {
   ExtBuf = SORT_NEW_BUFFER(L);
 
   if (ExtBuf == NULL) {
-    return;  /* fail */
+    return; /* fail */
   }
 
-  Tags = (int*)malloc(NK * sizeof(int));
+  Tags = (int *)malloc(NK * sizeof(int));
 
   if (Tags == NULL) {
     return;
@@ -2623,13 +2699,14 @@ static void GRAIL_MERGE_RIGHT(SORT_TYPE *arr, int L1, int L2, int M) {
     }
   }
 
-  if (p2 != p0) while (p2 >= L1) {
+  if (p2 != p0)
+    while (p2 >= L1) {
       GRAIL_SWAP1(arr + (p0--), arr + (p2--));
     }
 }
 
-static void GRAIL_SMART_MERGE_WITH_BUFFER(SORT_TYPE *arr, int *alen1, int *atype, int len2,
-    int lkeys) {
+static void GRAIL_SMART_MERGE_WITH_BUFFER(SORT_TYPE *arr, int *alen1,
+                                          int *atype, int len2, int lkeys) {
   int p0 = -lkeys, p1 = 0, p2 = *alen1, q1 = p2, q2 = p2 + len2;
   int ftype = 1 - *atype; /* 1 if inverted */
 
@@ -2652,7 +2729,8 @@ static void GRAIL_SMART_MERGE_WITH_BUFFER(SORT_TYPE *arr, int *alen1, int *atype
     *atype = ftype;
   }
 }
-static void GRAIL_SMART_MERGE_WITHOUT_BUFFER(SORT_TYPE *arr, int *alen1, int *atype, int _len2) {
+static void GRAIL_SMART_MERGE_WITHOUT_BUFFER(SORT_TYPE *arr, int *alen1,
+                                             int *atype, int _len2) {
   int len1, len2, ftype, h;
 
   if (!_len2) {
@@ -2665,8 +2743,8 @@ static void GRAIL_SMART_MERGE_WITHOUT_BUFFER(SORT_TYPE *arr, int *alen1, int *at
 
   if (len1 && SORT_CMP_A(arr + (len1 - 1), arr + len1) - ftype >= 0) {
     while (len1) {
-      h = ftype ? GRAIL_BIN_SEARCH_LEFT(arr + len1, len2, arr) : GRAIL_BIN_SEARCH_RIGHT(arr + len1, len2,
-          arr);
+      h = ftype ? GRAIL_BIN_SEARCH_LEFT(arr + len1, len2, arr)
+                : GRAIL_BIN_SEARCH_RIGHT(arr + len1, len2, arr);
 
       if (h != 0) {
         GRAIL_ROTATE(arr, len1, h);
@@ -2705,13 +2783,14 @@ static void GRAIL_MERGE_LEFT_WITH_X_BUF(SORT_TYPE *arr, int L1, int L2, int M) {
     }
   }
 
-  if (M != p0) while (p0 < L1) {
+  if (M != p0)
+    while (p0 < L1) {
       arr[M++] = arr[p0++];
     }
 }
 
-static void GRAIL_SMART_MERGE_WITH_X_BUF(SORT_TYPE *arr, int *alen1, int *atype, int len2,
-    int lkeys) {
+static void GRAIL_SMART_MERGE_WITH_X_BUF(SORT_TYPE *arr, int *alen1, int *atype,
+                                         int len2, int lkeys) {
   int p0 = -lkeys, p1 = 0, p2 = *alen1, q1 = p2, q2 = p2 + len2;
   int ftype = 1 - *atype; /* 1 if inverted */
 
@@ -2737,13 +2816,18 @@ static void GRAIL_SMART_MERGE_WITH_X_BUF(SORT_TYPE *arr, int *alen1, int *atype,
 
 /*
   arr - starting array. arr[-lblock..-1] - buffer (if havebuf).
-  lblock - length of regular blocks. First nblocks are stable sorted by 1st elements and key-coded
-  keys - arrays of keys, in same order as blocks. key<midkey means stream A
-  nblock2 are regular blocks from stream A. llast is length of last (irregular) block from stream B, that should go before nblock2 blocks.
-  llast=0 requires nblock2=0 (no irregular blocks). llast>0, nblock2=0 is possible.
+  lblock - length of regular blocks. First nblocks are stable sorted by 1st
+  elements and key-coded keys - arrays of keys, in same order as blocks.
+  key<midkey means stream A nblock2 are regular blocks from stream A. llast is
+  length of last (irregular) block from stream B, that should go before nblock2
+  blocks. llast=0 requires nblock2=0 (no irregular blocks). llast>0, nblock2=0
+  is possible.
 */
-static void GRAIL_MERGE_BUFFERS_LEFT_WITH_X_BUF(SORT_TYPE *keys, SORT_TYPE *midkey, SORT_TYPE *arr,
-    int nblock, int lblock, int nblock2, int llast) {
+static void GRAIL_MERGE_BUFFERS_LEFT_WITH_X_BUF(SORT_TYPE *keys,
+                                                SORT_TYPE *midkey,
+                                                SORT_TYPE *arr, int nblock,
+                                                int lblock, int nblock2,
+                                                int llast) {
   int l, prest, lrest, frest, pidx, cidx, fnext;
 
   if (nblock == 0) {
@@ -2794,12 +2878,13 @@ static void GRAIL_MERGE_BUFFERS_LEFT_WITH_X_BUF(SORT_TYPE *keys, SORT_TYPE *midk
   input: [-K,-1] elements are buffer
   output: first K elements are buffer, blocks 2*K and last subblock sorted
 */
-static void GRAIL_BUILD_BLOCKS(SORT_TYPE *arr, int L, int K, SORT_TYPE *extbuf, int LExtBuf) {
+static void GRAIL_BUILD_BLOCKS(SORT_TYPE *arr, int L, int K, SORT_TYPE *extbuf,
+                               int LExtBuf) {
   int m, u, h, p0, p1, rest, restk, p, kbuf;
   kbuf = K < LExtBuf ? K : LExtBuf;
 
   while (kbuf & (kbuf - 1)) {
-    kbuf &= kbuf - 1;  /* max power or 2 - just in case */
+    kbuf &= kbuf - 1; /* max power or 2 - just in case */
   }
 
   if (kbuf) {
@@ -2902,13 +2987,16 @@ static void GRAIL_BUILD_BLOCKS(SORT_TYPE *arr, int L, int K, SORT_TYPE *extbuf, 
 
 /*
   arr - starting array. arr[-lblock..-1] - buffer (if havebuf).
-  lblock - length of regular blocks. First nblocks are stable sorted by 1st elements and key-coded
-  keys - arrays of keys, in same order as blocks. key<midkey means stream A
-  nblock2 are regular blocks from stream A. llast is length of last (irregular) block from stream B, that should go before nblock2 blocks.
-  llast=0 requires nblock2=0 (no irregular blocks). llast>0, nblock2=0 is possible.
+  lblock - length of regular blocks. First nblocks are stable sorted by 1st
+  elements and key-coded keys - arrays of keys, in same order as blocks.
+  key<midkey means stream A nblock2 are regular blocks from stream A. llast is
+  length of last (irregular) block from stream B, that should go before nblock2
+  blocks. llast=0 requires nblock2=0 (no irregular blocks). llast>0, nblock2=0
+  is possible.
 */
-static void GRAIL_MERGE_BUFFERS_LEFT(SORT_TYPE *keys, SORT_TYPE *midkey, SORT_TYPE *arr, int nblock,
-                                     int lblock, int havebuf, int nblock2, int llast) {
+static void GRAIL_MERGE_BUFFERS_LEFT(SORT_TYPE *keys, SORT_TYPE *midkey,
+                                     SORT_TYPE *arr, int nblock, int lblock,
+                                     int havebuf, int nblock2, int llast) {
   int l, prest, lrest, frest, pidx, cidx, fnext;
 
   if (nblock == 0) {
@@ -2940,7 +3028,8 @@ static void GRAIL_MERGE_BUFFERS_LEFT(SORT_TYPE *keys, SORT_TYPE *midkey, SORT_TY
       lrest = lblock;
     } else {
       if (havebuf) {
-        GRAIL_SMART_MERGE_WITH_BUFFER(arr + prest, &lrest, &frest, lblock, lblock);
+        GRAIL_SMART_MERGE_WITH_BUFFER(arr + prest, &lrest, &frest, lblock,
+                                      lblock);
       } else {
         GRAIL_SMART_MERGE_WITHOUT_BUFFER(arr + prest, &lrest, &frest, lblock);
       }
@@ -3001,11 +3090,12 @@ static void GRAIL_LAZY_STABLE_SORT(SORT_TYPE *arr, int L) {
 }
 
 /*
-  keys are on the left of arr. Blocks of length LL combined. We'll combine them in pairs
-  LL and nkeys are powers of 2. (2*LL/lblock) keys are guarantied
+  keys are on the left of arr. Blocks of length LL combined. We'll combine them
+  in pairs LL and nkeys are powers of 2. (2*LL/lblock) keys are guarantied
 */
-static void GRAIL_COMBINE_BLOCKS(SORT_TYPE *keys, SORT_TYPE *arr, int len, int LL, int lblock,
-                                 int havebuf, SORT_TYPE *xbuf) {
+static void GRAIL_COMBINE_BLOCKS(SORT_TYPE *keys, SORT_TYPE *arr, int len,
+                                 int LL, int lblock, int havebuf,
+                                 SORT_TYPE *xbuf) {
   int M, b, NBlk, midkey, lrest, u, p, v, kc, nbl2, llast;
   SORT_TYPE *arr1;
   M = len / (2 * LL);
@@ -3042,11 +3132,11 @@ static void GRAIL_COMBINE_BLOCKS(SORT_TYPE *keys, SORT_TYPE *arr, int len, int L
       }
 
       if (p != u - 1) {
-        GRAIL_SWAP_N(arr1 + (u - 1)*lblock, arr1 + p * lblock, lblock);
+        GRAIL_SWAP_N(arr1 + (u - 1) * lblock, arr1 + p * lblock, lblock);
         GRAIL_SWAP1(keys + (u - 1), keys + p);
 
         if (midkey == u - 1 || midkey == p) {
-          midkey ^= (u - 1)^p;
+          midkey ^= (u - 1) ^ p;
         }
       }
     }
@@ -3058,15 +3148,18 @@ static void GRAIL_COMBINE_BLOCKS(SORT_TYPE *keys, SORT_TYPE *arr, int len, int L
     }
 
     if (llast != 0) {
-      while (nbl2 < NBlk && SORT_CMP_A(arr1 + NBlk * lblock, arr1 + (NBlk - nbl2 - 1)*lblock) < 0) {
+      while (nbl2 < NBlk && SORT_CMP_A(arr1 + NBlk * lblock,
+                                       arr1 + (NBlk - nbl2 - 1) * lblock) < 0) {
         nbl2++;
       }
     }
 
     if (xbuf) {
-      GRAIL_MERGE_BUFFERS_LEFT_WITH_X_BUF(keys, keys + midkey, arr1, NBlk - nbl2, lblock, nbl2, llast);
+      GRAIL_MERGE_BUFFERS_LEFT_WITH_X_BUF(keys, keys + midkey, arr1,
+                                          NBlk - nbl2, lblock, nbl2, llast);
     } else {
-      GRAIL_MERGE_BUFFERS_LEFT(keys, keys + midkey, arr1, NBlk - nbl2, lblock, havebuf, nbl2, llast);
+      GRAIL_MERGE_BUFFERS_LEFT(keys, keys + midkey, arr1, NBlk - nbl2, lblock,
+                               havebuf, nbl2, llast);
     }
   }
 
@@ -3083,8 +3176,8 @@ static void GRAIL_COMBINE_BLOCKS(SORT_TYPE *keys, SORT_TYPE *arr, int len, int L
   }
 }
 
-
-static void GRAIL_COMMON_SORT(SORT_TYPE *arr, int Len, SORT_TYPE *extbuf, int LExtBuf) {
+static void GRAIL_COMMON_SORT(SORT_TYPE *arr, int Len, SORT_TYPE *extbuf,
+                              int LExtBuf) {
   int lblock, nkeys, findkeys, ptr, cbuf, lb, nk;
   int havebuf, chavebuf;
   long long s;
@@ -3151,8 +3244,8 @@ static void GRAIL_COMMON_SORT(SORT_TYPE *arr, int Len, SORT_TYPE *extbuf, int LE
       }
     }
 
-    GRAIL_COMBINE_BLOCKS(arr, arr + ptr, Len - ptr, cbuf, lb, chavebuf, chavebuf
-                         && lb <= LExtBuf ? extbuf : NULL);
+    GRAIL_COMBINE_BLOCKS(arr, arr + ptr, Len - ptr, cbuf, lb, chavebuf,
+                         chavebuf && lb <= LExtBuf ? extbuf : NULL);
   }
 
   SMALL_SORT(arr, ptr);

@@ -12,11 +12,16 @@
    but the one below is often faster for integer types.
 */
 #define SORT_CMP(x, y) (x - y)
-#define MAX(x,y) (((x) > (y) ? (x) : (y)))
-#define MIN(x,y) (((x) < (y) ? (x) : (y)))
-#define SORT_CSWAP(x, y) {SORT_TYPE _sort_swap_temp = MAX((x), (y)); (x) = MIN((x),(y)); (y) = _sort_swap_temp;}
-#include "sort.h"
+#define MAX(x, y) (((x) > (y) ? (x) : (y)))
+#define MIN(x, y) (((x) < (y) ? (x) : (y)))
+#define SORT_CSWAP(x, y)                                                       \
+  {                                                                            \
+    SORT_TYPE _sort_swap_temp = MAX((x), (y));                                 \
+    (x) = MIN((x), (y));                                                       \
+    (y) = _sort_swap_temp;                                                     \
+  }
 #include "extra.h"
+#include "sort.h"
 
 /*
    We now have the following functions defined
@@ -30,7 +35,6 @@
 
    Each takes two arguments: int64_t *array, size_t size
 */
-
 
 /* Used to control the demo */
 #define SEED 123
@@ -71,11 +75,10 @@ static void fill(int64_t *arr, const int size) {
 
 /* used for stdlib */
 static __inline int simple_cmp(const void *a, const void *b) {
-  const int64_t da = *((const int64_t *) a);
-  const int64_t db = *((const int64_t *) b);
+  const int64_t da = *((const int64_t *)a);
+  const int64_t db = *((const int64_t *)b);
   return (da < db) ? -1 : (da == db) ? 0 : 1;
 }
-
 
 void run_tests(void) {
   int i;
@@ -98,7 +101,8 @@ void run_tests(void) {
     verify(dst, SIZE);
   }
 
-  printf("stdlib qsort time:               %10.2f us per iteration\n", total_time / RUNS);
+  printf("stdlib qsort time:               %10.2f us per iteration\n",
+         total_time / RUNS);
 #if !defined(__linux__) && !defined(__CYGWIN__)
   srand48(SEED);
   total_time = 0.0;
@@ -113,7 +117,8 @@ void run_tests(void) {
     verify(dst, SIZE);
   }
 
-  printf("stdlib heapsort time:            %10.2f us per iteration\n", total_time / RUNS);
+  printf("stdlib heapsort time:            %10.2f us per iteration\n",
+         total_time / RUNS);
   srand48(SEED);
   total_time = 0.0;
 
@@ -127,7 +132,8 @@ void run_tests(void) {
     verify(dst, SIZE);
   }
 
-  printf("stdlib mergesort time:           %10.2f us per iteration\n", total_time / RUNS);
+  printf("stdlib mergesort time:           %10.2f us per iteration\n",
+         total_time / RUNS);
 #endif
   srand48(SEED);
   total_time = 0.0;
@@ -142,7 +148,8 @@ void run_tests(void) {
     verify(dst, SIZE);
   }
 
-  printf("quick sort time:                 %10.2f us per iteration\n", total_time / RUNS);
+  printf("quick sort time:                 %10.2f us per iteration\n",
+         total_time / RUNS);
   srand48(SEED);
   total_time = 0.0;
 
@@ -156,7 +163,8 @@ void run_tests(void) {
     verify(dst, SIZE);
   }
 
-  printf("selection sort time:             %10.2f us per iteration\n", total_time / RUNS);
+  printf("selection sort time:             %10.2f us per iteration\n",
+         total_time / RUNS);
   srand48(SEED);
   total_time = 0.0;
 
@@ -170,7 +178,8 @@ void run_tests(void) {
     verify(dst, SIZE);
   }
 
-  printf("bubble sort time:                %10.2f us per iteration\n", total_time / RUNS);
+  printf("bubble sort time:                %10.2f us per iteration\n",
+         total_time / RUNS);
   srand48(SEED);
   total_time = 0.0;
 
@@ -184,7 +193,8 @@ void run_tests(void) {
     verify(dst, SIZE);
   }
 
-  printf("bitonic sort time:               %10.2f us per iteration\n", total_time / RUNS);
+  printf("bitonic sort time:               %10.2f us per iteration\n",
+         total_time / RUNS);
   srand48(SEED);
   total_time = 0.0;
 
@@ -198,7 +208,8 @@ void run_tests(void) {
     verify(dst, SIZE);
   }
 
-  printf("merge sort time:                 %10.2f us per iteration\n", total_time / RUNS);
+  printf("merge sort time:                 %10.2f us per iteration\n",
+         total_time / RUNS);
   srand48(SEED);
   total_time = 0.0;
 
@@ -212,7 +223,8 @@ void run_tests(void) {
     verify(dst, SIZE);
   }
 
-  printf("binary insertion sort time:      %10.2f us per iteration\n", total_time / RUNS);
+  printf("binary insertion sort time:      %10.2f us per iteration\n",
+         total_time / RUNS);
   srand48(SEED);
   total_time = 0.0;
 
@@ -226,7 +238,8 @@ void run_tests(void) {
     verify(dst, SIZE);
   }
 
-  printf("heap sort time:                  %10.2f us per iteration\n", total_time / RUNS);
+  printf("heap sort time:                  %10.2f us per iteration\n",
+         total_time / RUNS);
   srand48(SEED);
   total_time = 0.0;
 
@@ -240,7 +253,8 @@ void run_tests(void) {
     verify(dst, SIZE);
   }
 
-  printf("shell sort time:                 %10.2f us per iteration\n", total_time / RUNS);
+  printf("shell sort time:                 %10.2f us per iteration\n",
+         total_time / RUNS);
   srand48(SEED);
   total_time = 0.0;
 
@@ -254,7 +268,8 @@ void run_tests(void) {
     verify(dst, SIZE);
   }
 
-  printf("tim sort time:                   %10.2f us per iteration\n", total_time / RUNS);
+  printf("tim sort time:                   %10.2f us per iteration\n",
+         total_time / RUNS);
   srand48(SEED);
   total_time = 0.0;
 
@@ -268,7 +283,8 @@ void run_tests(void) {
     verify(dst, SIZE);
   }
 
-  printf("in-place merge sort time:        %10.2f us per iteration\n", total_time / RUNS);
+  printf("in-place merge sort time:        %10.2f us per iteration\n",
+         total_time / RUNS);
   srand48(SEED);
   total_time = 0.0;
 
@@ -282,7 +298,8 @@ void run_tests(void) {
     verify(dst, SIZE);
   }
 
-  printf("grail sort time:                 %10.2f us per iteration\n", total_time / RUNS);
+  printf("grail sort time:                 %10.2f us per iteration\n",
+         total_time / RUNS);
   srand48(SEED);
   total_time = 0.0;
 
@@ -296,7 +313,8 @@ void run_tests(void) {
     verify(dst, SIZE);
   }
 
-  printf("sqrt sort time:                  %10.2f us per iteration\n", total_time / RUNS);
+  printf("sqrt sort time:                  %10.2f us per iteration\n",
+         total_time / RUNS);
   srand48(SEED);
   total_time = 0.0;
 
@@ -310,7 +328,8 @@ void run_tests(void) {
     verify(dst, SIZE);
   }
 
-  printf("rec stable sort sort time:       %10.2f us per iteration\n", total_time / RUNS);
+  printf("rec stable sort sort time:       %10.2f us per iteration\n",
+         total_time / RUNS);
   srand48(SEED);
   total_time = 0.0;
 
@@ -324,7 +343,8 @@ void run_tests(void) {
     verify(dst, SIZE);
   }
 
-  printf("grail sort dyn buffer sort time: %10.2f us per iteration\n", total_time / RUNS);
+  printf("grail sort dyn buffer sort time: %10.2f us per iteration\n",
+         total_time / RUNS);
   srand48(SEED);
   total_time = 0.0;
 
@@ -338,7 +358,8 @@ void run_tests(void) {
     verify(dst, SIZE);
   }
 
-  printf("std::sort time:                  %10.2f us per iteration\n", total_time / RUNS);
+  printf("std::sort time:                  %10.2f us per iteration\n",
+         total_time / RUNS);
   srand48(SEED);
   total_time = 0.0;
 
@@ -352,7 +373,8 @@ void run_tests(void) {
     verify(dst, SIZE);
   }
 
-  printf("std::stable_sort time:           %10.2f us per iteration\n", total_time / RUNS);
+  printf("std::stable_sort time:           %10.2f us per iteration\n",
+         total_time / RUNS);
 }
 
 int main(void) {
