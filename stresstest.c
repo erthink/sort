@@ -518,7 +518,7 @@ int main(void) {
   int i = 0;
   int64_t sizes[TESTS];
   srand48(SEED);
-  stable_tests();
+  // stable_tests();
   fill_random(sizes, TESTS);
 
   for (i = 0; i < TESTS; i++) {
