@@ -1,3 +1,5 @@
+/* libmdbx internal sort routines, see https://github.com/erthink/libmdbx */
+
 #include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
