@@ -151,6 +151,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 add_executable(runme stresstest.c sort.h extra.h
     sort_rela589n.cxx
     yysort.c
+    radix7.cpp
     std_sort.cxx)
 
 cmake_policy(POP)

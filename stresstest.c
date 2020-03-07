@@ -373,6 +373,7 @@ int run_tests(int64_t *sizes, int sizes_cnt, int type) {
   // TEST_EXTRA_H(yysort1_int64_sb);
   // TEST_EXTRA_H(yysort2_int64_sb);
   TEST_EXTRA_H(sort_rela589n_int64);
+  TEST_EXTRA_H(radix_sort7_int64);
 
   TEST_SORT_H(tim_sort);
   TEST_SORT_H(quick_sort);
